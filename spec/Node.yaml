@@ -1,0 +1,25 @@
+description: Node that holds skill.
+type: object
+title: Node
+properties:
+  id: { type: string }
+  children:
+    type: array
+    description: Child node
+    items:
+      $ref: '#/'
+  skill:
+    $ref: 'Skill.yaml'
+    description: Referenced skill
+  parent:
+    description: Parent node
+    $ref: '#/'
+
+
+
+
+example:
+  id: '0001'
+  children: [ { id: '0002' } ]
+  parent: { id: '0000' }
+  skill: { id: '0000' }

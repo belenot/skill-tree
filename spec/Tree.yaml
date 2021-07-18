@@ -1,0 +1,9 @@
+title: Tree
+description: Tree root.
+properties:
+  id:
+    type: string
+  root:
+    $ref: Node.yaml
+  description:
+    type: string

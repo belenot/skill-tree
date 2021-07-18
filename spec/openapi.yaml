@@ -1,0 +1,272 @@
+openapi: 3.0.0
+servers:
+- url: ""
+components:
+  schemas:
+    Tree:
+      $ref: Tree.yaml
+    Node:
+      $ref: Node.yaml
+    Skill:
+      $ref: Skill.yaml
+paths:
+  /skill:
+    get:
+      parameters:
+      - name: page
+        schema:
+          type: integer
+        in: query
+      - name: size
+        schema:
+          type: integer
+        in: query
+      responses:
+        200:
+          description: Paged list of Skills.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Skill' }
+      tags: [ skill ]
+    post:
+      description: Create new skill.
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Skill' }
+      responses:
+        200:
+          description: Created new skill.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Skill' }
+        400:
+          description: Can't create skill.
+      tags: [ skill ]
+  /skill/{id}:
+    get:
+      description: Get skill by id.
+      responses:
+        200:
+          description: Skill with selected id.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Skill' }
+        404:
+          description: Skill not found.
+      tags: [ skill ]
+    put:
+      parameters:
+      - in: query
+        name: id
+        schema:
+          type: integer
+      description: Update skill by id.
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Skill' }
+      responses:
+        200:
+          description: Skill is updated.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Skill' }
+        409:
+          description: Can't update skill.
+        404:
+          description: Skill not found.
+      tags: [ skill ]
+    delete:
+      parameters:
+      - in: query
+        name: id
+        schema:
+          type: integer
+      responses:
+        200:
+          description: Skill was deleted.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Skill' }
+        404:
+          description: Skill not found.
+      tags: [ skill ]
+  /node:
+    get:
+      parameters:
+      - name: page
+        schema:
+          type: integer
+        in: query
+      - name: size
+        schema:
+          type: integer
+        in: query
+      responses:
+        200:
+          description: Paged list of Nodes.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Node' }
+      tags: [ node ]
+    post:
+      description: Create new node.
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Node' }
+      responses:
+        200:
+          description: Created new node.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Node' }
+        400:
+          description: Can't create node.
+      tags: [ node ]
+  /node/{id}:
+    get:
+      description: Get node by id.
+      responses:
+        200:
+          description: Node with selected id.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Node' }
+        404:
+          description: Node not found.
+      tags: [ node ]
+    put:
+      parameters:
+      - in: query
+        name: id
+        schema:
+          type: integer
+      description: Update node by id.
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Node' }
+      responses:
+        200:
+          description: Node is updated.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Node' }
+        409:
+          description: Can't update node.
+        404:
+          description: Node not found.
+      tags: [ node ]
+    delete:
+      parameters:
+      - in: query
+        name: id
+        schema:
+          type: integer
+      responses:
+        200:
+          description: Node was deleted.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Node' }
+        404:
+          description: Node not found.
+      tags: [ node ]
+  /tree:
+    get:
+      parameters:
+      - name: page
+        schema:
+          type: integer
+        in: query
+      - name: size
+        schema:
+          type: integer
+        in: query
+      responses:
+        200:
+          description: Paged list of Trees.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Tree' }
+      tags: [ tree ]
+    post:
+      description: Create new tree.
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Tree' }
+      responses:
+        200:
+          description: Created new Tree.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Tree' }
+        400:
+          description: Can't create Tree.
+      tags: [ tree ]
+  /tree/{id}:
+    get:
+      description: Get tree by id.
+      responses:
+        200:
+          description: Tree with selected id.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Tree' }
+        404:
+          description: Tree not found.
+      tags: [ tree ]
+    put:
+      parameters:
+      - in: query
+        name: id
+        schema:
+          type: integer
+      description: Update tree by id.
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Tree' }
+      responses:
+        200:
+          description: Tree is updated.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Tree' }
+        409:
+          description: Can't update tree.
+        404:
+          description: Tree not found.
+      tags: [ tree ]
+    delete:
+      parameters:
+      - in: query
+        name: id
+        schema:
+          type: integer
+      responses:
+        200:
+          description: Tree was deleted.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Tree' }
+        404:
+          description: Tree not found.
+      tags: [ tree ]
+
+info:
+  title: Skill Tree
+  version: "1.0.0"
+  contact:
+    name: Sergey
+    url: belenot.com
+    email: kholhunov0@gmail.com

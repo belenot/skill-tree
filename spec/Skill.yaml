@@ -1,0 +1,6 @@
+description: Skill object.
+type: object
+title: Skill
+properties:
+  id: { type: string }
+  title: { type: string }
