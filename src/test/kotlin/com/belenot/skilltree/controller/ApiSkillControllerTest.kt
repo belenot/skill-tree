@@ -20,7 +20,7 @@ class ApiSkillControllerTest {
     @Test
     fun `get empty list of skills`() {
         val response = restTemplate.getForEntity<String>(
-            url = "/skill", uriVariables = mapOf("page" to 0, "size" to 0))
+            url = "/skill?page=0&size=1")
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
     }
 

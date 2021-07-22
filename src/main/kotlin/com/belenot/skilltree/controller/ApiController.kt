@@ -17,7 +17,7 @@ class ApiController {
 
     @GetMapping("/skill")
     fun getSkill(@RequestParam("page") page: Int, @RequestParam("size") size: Int) =
-        skills.values.asSequence().chunked(size).drop(page).first()
+        skills.values.asSequence().chunked(size).drop(page).firstOrNull()?: emptyList()
 
     @GetMapping("/skill/{id}")
     fun getSkill(@PathVariable id: String) = skills[id]
@@ -40,7 +40,7 @@ class ApiController {
 
     @GetMapping("/node")
     fun getNode(@RequestParam("page") page: Int, @RequestParam("size") size: Int) =
-        nodes.values.asSequence().chunked(size).drop(page).first()
+        nodes.values.asSequence().chunked(size).drop(page).firstOrNull()?: emptyList()
 
     @GetMapping("/node/{id}")
     fun getNode(@PathVariable id: String) = nodes[id]

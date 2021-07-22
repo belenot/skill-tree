@@ -24,7 +24,7 @@ class ApiNodeControllerTest {
     @Test
     fun `get empty list of nodes`() {
         val response = restTemplate.getForEntity<String>(
-            url = "/node", uriVariables = mapOf("page" to 0, "size" to 0))
+            url = "/node?page=0&size=1")
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
     }
 
