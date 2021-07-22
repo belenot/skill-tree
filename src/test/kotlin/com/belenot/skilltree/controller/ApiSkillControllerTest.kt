@@ -62,4 +62,12 @@ class ApiSkillControllerTest {
         val updatedSkill = restTemplate.getForEntity<Skill>("/skill/${createdSkill.body?.id}")
         assertThat(updatedSkill.body?.title).isEqualTo(putSkill.title)
     }
+
+    @Test
+    fun `put non-existing skill should return 404` () {
+        val id = newUUID()
+        val putSkill = PutSkill("Non-existing skill")
+        val response = restTemplate.exchange<Any>("/skill/${id}", HttpMethod.PUT, HttpEntity(putSkill))
+        assertThat(response.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
+    }
 }

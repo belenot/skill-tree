@@ -6,6 +6,7 @@ import com.belenot.skilltree.domain.Tree
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.client.HttpClientErrorException
+import org.springframework.web.server.ResponseStatusException
 import java.util.*
 
 @RestController
@@ -34,7 +35,8 @@ class ApiController {
 
     @PutMapping("/skill/{id}")
     fun replaceSkill(@PathVariable id: String, @RequestBody putSkill: PutSkill) =
-        if (skills.containsKey(id)) skills.replace(id, putSkill.toSkill(id)) else null
+        if (skills.containsKey(id)) skills.replace(id, putSkill.toSkill(id))
+        else throw ResponseStatusException(HttpStatus.NOT_FOUND)
 
     @GetMapping("/node")
     fun getNode(@RequestParam("page") page: Int, @RequestParam("size") size: Int) =
@@ -52,7 +54,7 @@ class ApiController {
             nodes[id] = node
             return node
         } else {
-            throw HttpClientErrorException(HttpStatus.BAD_REQUEST, "Not found skill with id = ${postNode.skillId}.")
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Not found skill with id = ${postNode.skillId}.")
         }
     }
 
@@ -78,17 +80,17 @@ class ApiController {
                 nodes[id] = node
                 return node
             } else {
-                throw HttpClientErrorException(HttpStatus.BAD_REQUEST, "Not found skill with id = ${putNode.skillId}.")
+                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Not found skill with id = ${putNode.skillId}.")
             }
         } else {
-            throw HttpClientErrorException(HttpStatus.NOT_FOUND)
+            throw ResponseStatusException(HttpStatus.NOT_FOUND)
         }
     }
 
 
-    @ExceptionHandler
-    @ResponseBody
-    fun exceptionHandler(exc: Exception) = exc.message ?: exc.toString()
+//    @ExceptionHandler
+//    @ResponseBody
+//    fun exceptionHandler(exc: Exception) = exc.message ?: exc.toString()
 }
 
 data class PostSkill(val title: String)
