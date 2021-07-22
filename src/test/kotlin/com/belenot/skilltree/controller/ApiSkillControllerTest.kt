@@ -13,7 +13,7 @@ import org.springframework.http.*
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class ApiControllerTest {
+class ApiSkillControllerTest {
     @Autowired
     lateinit var restTemplate: TestRestTemplate
 
