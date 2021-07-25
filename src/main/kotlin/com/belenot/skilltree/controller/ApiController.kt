@@ -6,6 +6,7 @@ import com.belenot.skilltree.domain.Tree
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.client.HttpClientErrorException
+import org.springframework.web.client.HttpStatusCodeException
 import org.springframework.web.server.ResponseStatusException
 import java.util.*
 
@@ -20,7 +21,9 @@ class ApiController {
         skills.values.asSequence().chunked(size).drop(page).firstOrNull()?: emptyList()
 
     @GetMapping("/skill/{id}")
-    fun getSkill(@PathVariable id: String) = skills[id]
+    fun getSkill(@PathVariable id: String) =
+        if (skills.containsKey(id)) skills[id]
+        else throw ResponseStatusException(HttpStatus.NOT_FOUND)
 
     @PostMapping("/skill")
     fun postSkill(@RequestBody postSkill: PostSkill ): Skill {
@@ -43,7 +46,9 @@ class ApiController {
         nodes.values.asSequence().chunked(size).drop(page).firstOrNull()?: emptyList()
 
     @GetMapping("/node/{id}")
-    fun getNode(@PathVariable id: String) = nodes[id]
+    fun getNode(@PathVariable id: String) =
+        if (nodes.containsKey(id)) nodes[id]
+        else throw ResponseStatusException(HttpStatus.NOT_FOUND)
 
     @PostMapping("/node")
     fun postNode(@RequestBody postNode: PostNode ): Node {
@@ -87,10 +92,56 @@ class ApiController {
         }
     }
 
+    @GetMapping("/tree")
+    fun getTree(@RequestParam("page") page: Int, @RequestParam("size") size: Int) =
+        trees.values.asSequence().chunked(size).drop(page).firstOrNull()?: emptyList()
 
-//    @ExceptionHandler
-//    @ResponseBody
-//    fun exceptionHandler(exc: Exception) = exc.message ?: exc.toString()
+    @GetMapping("/tree/{id}")
+    fun getTree(@PathVariable id: String) =
+        if (trees.containsKey(id)) trees[id]
+        else throw ResponseStatusException(HttpStatus.NOT_FOUND)
+
+    @PostMapping("/tree")
+    fun postTree(@RequestBody postTree: PostTree ): Tree {
+        val root = nodes[postTree.rootId]
+        if (root != null) {
+            val tree = createTree(postTree, root)
+            val id = tree.id
+            trees[id] = tree
+            return tree
+        } else {
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Not found root node with id = ${postTree.rootId}.")
+        }
+    }
+
+    private fun createTree(
+        postTree: PostTree,
+        root: Node,
+        id: String = newUUID()
+    ) = Tree(
+        id = id,
+        root = root,
+        description = postTree.description
+    )
+
+    @DeleteMapping("/tree/{id}")
+    fun deleteTree(@PathVariable id: String) = trees.remove(id)
+
+    @PutMapping("/tree/{id}")
+    fun replaceTree(@PathVariable id: String, @RequestBody putTree: PutTree): Tree {
+        if (trees.containsKey(id)) {
+            val root = nodes[putTree.rootId]
+            if (root != null) {
+                val tree = createTree(putTree, root, id = id)
+                trees[id] = tree
+                return tree
+            } else {
+                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Not found root node with id = ${putTree.rootId}.")
+            }
+        } else {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND)
+        }
+    }
 }
 
 data class PostSkill(val title: String)
@@ -104,5 +155,12 @@ data class PostNode(
     val parentId: String? = null)
 
 typealias PutNode = PostNode
+
+data class PostTree(
+    val rootId: String,
+    val description: String = ""
+)
+
+typealias PutTree = PostTree
 
 fun newUUID() = UUID.randomUUID().toString()
