@@ -2,6 +2,7 @@ package com.belenot.skilltree.controller
 
 import com.belenot.skilltree.domain.Node
 import com.belenot.skilltree.domain.Skill
+import com.belenot.skilltree.utils.newUUID
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -78,4 +79,40 @@ class ApiNodeControllerTest {
         assertThat(response.body?.id).isEqualTo(createdNode.body?.id)
         assertThat(response.body?.skill?.id).isEqualTo(anotherSkillId)
     }
+
+    @Test
+    fun `Given unknown nodeId When get node Then return NOT_FOUND`() {
+        val id = newUUID()
+        val response = restTemplate.getForEntity<String>("/node/${id}")
+        assertThat(response.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
+    }
+
+    @Test
+    fun `Given unknown skillId When post node Then return BAD_REQUEST`() {
+        val skillId = newUUID()
+        val postNode = PostNode(skillId = skillId)
+        val response = restTemplate.postForEntity<Any>("/node", postNode)
+        assertThat(response.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
+    }
+
+    @Test
+    fun `Given unknown nodeId When put node Then return NOT_FOUND`() {
+        val nodeId = newUUID()
+        val putNode = PutNode(skillId = newUUID())
+        val response = restTemplate.exchange<Any>("/node/${nodeId}", HttpMethod.PUT, HttpEntity(putNode))
+        assertThat(response.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
+    }
+
+    @Test
+    fun `Given created node and unknown skill id When replace node Then return BAD_REQUEST`() {
+        val postSkillResponse = restTemplate.postForEntity<Skill>(
+            "/skill", PostSkill("Skill for node"))
+        val postNode = PostNode(skillId = postSkillResponse.body!!.id)
+        val postNodeResponse = restTemplate.postForEntity<Node>("/node", postNode)
+        val putNode = PutNode(newUUID())
+        val response = restTemplate.exchange<Any>(
+            "/node/${postNodeResponse.body!!.id}", HttpMethod.PUT, HttpEntity(putNode))
+        assertThat(response.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
+    }
+
 }

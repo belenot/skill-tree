@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.boot.test.web.client.getForEntity
 import org.assertj.core.api.Assertions.*
+import org.junit.jupiter.api.assertThrows
 import org.springframework.boot.test.web.client.exchange
 import org.springframework.boot.test.web.client.postForEntity
 import org.springframework.http.*
@@ -69,6 +70,13 @@ class ApiSkillControllerTest {
         val id = newUUID()
         val putSkill = PutSkill("Non-existing skill")
         val response = restTemplate.exchange<Any>("/skill/${id}", HttpMethod.PUT, HttpEntity(putSkill))
+        assertThat(response.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
+    }
+
+    @Test
+    fun `Given unknown skillId When get skill Then return NOT_FOUND`() {
+        val id = newUUID()
+        val response = restTemplate.getForEntity<String>("/skill/${id}")
         assertThat(response.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
     }
 }

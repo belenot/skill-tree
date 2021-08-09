@@ -17,8 +17,7 @@ class SkillService {
 
     fun getSkill(id: String) =
         if (skills.containsKey(id)) skills[id]
-        // TODO throw service exception
-        else throw ResponseStatusException(HttpStatus.NOT_FOUND)
+        else null
 
     fun createSkill(title: String): Skill {
         val id = newUUID()

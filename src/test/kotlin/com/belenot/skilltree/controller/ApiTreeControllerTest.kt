@@ -3,6 +3,7 @@ package com.belenot.skilltree.controller
 import com.belenot.skilltree.domain.Node
 import com.belenot.skilltree.domain.Tree
 import com.belenot.skilltree.domain.Skill
+import com.belenot.skilltree.utils.newUUID
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -91,4 +92,52 @@ class ApiTreeControllerTest {
         assertThat(response.body?.id).isEqualTo(createdTreeId)
         assertThat(response.body?.root?.id).isEqualTo(anotherNodeId)
     }
+
+    @Test
+    fun `When get tree Then return tree`() {
+        val postSkill = PostSkill("post skill")
+        val postSkillResponse = restTemplate.postForEntity<Skill>("/skill", postSkill)
+        val postNode = PostNode(postSkillResponse.body!!.id)
+        val postNodeResponse = restTemplate.postForEntity<Node>("/node", postNode)
+        val postTree = PostTree(postNodeResponse.body!!.id)
+        val postTreeResponse = restTemplate.postForEntity<Tree>("/tree", postTree)
+        assertThat(postTreeResponse.statusCode).isEqualTo(HttpStatus.OK)
+    }
+
+    @Test
+    fun `Given unknown tree id When get tree Then return NOT_FOUND`() {
+        val treeId = newUUID()
+        val response = restTemplate.getForEntity<Any>("/tree/${treeId}")
+        assertThat(response.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
+    }
+
+    @Test
+    fun `Given unknown root node id When post tree Then return BAD_REQUEST`() {
+        val postTree = PostTree(newUUID(), "")
+        val response = restTemplate.postForEntity<Any>("/tree", postTree)
+        assertThat(response.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
+    }
+
+    @Test
+    fun `Given unknown treeId When put tree Then return NOT_FOUND`() {
+        val treeId = newUUID()
+        val putTree = PutTree(rootId = newUUID())
+        val response = restTemplate.exchange<Any>("/tree/${treeId}", HttpMethod.PUT, HttpEntity(putTree))
+        assertThat(response.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
+    }
+
+    @Test
+    fun `Given unknown root node id When put tree Then return BAD_REQUEST`() {
+        val postSkillResponse = restTemplate.postForEntity<Skill>(
+            "/skill", PostSkill("post skill"))
+        val postNodeResponse = restTemplate.postForEntity<Node>(
+            "/node", PostNode(postSkillResponse.body!!.id))
+        val postTreeResponse = restTemplate.postForEntity<Tree>(
+            "/tree", PostTree(postNodeResponse.body!!.id))
+        val response = restTemplate.exchange<Any>("/tree/${postTreeResponse.body!!.id}", HttpMethod.PUT,
+        HttpEntity(PutTree(rootId = newUUID())))
+        assertThat(response.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
+    }
+
+
 }

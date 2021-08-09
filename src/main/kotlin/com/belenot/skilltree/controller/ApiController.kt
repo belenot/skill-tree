@@ -1,10 +1,13 @@
 package com.belenot.skilltree.controller
 
+import com.belenot.skilltree.domain.Tree
 import com.belenot.skilltree.service.NodeService
 import com.belenot.skilltree.service.SkillService
 import com.belenot.skilltree.service.TreeService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.server.ResponseStatusException
 
 @RestController
 class ApiController {
@@ -21,7 +24,7 @@ class ApiController {
     fun getSkill(@RequestParam("page") page: Int, @RequestParam("size") size: Int) =  skillService.getSkill(page, size)
 
     @GetMapping("/skill/{id}")
-    fun getSkill(@PathVariable id: String) = skillService.getSkill(id)
+    fun getSkill(@PathVariable id: String) = skillService.getSkill(id)?:throw ResponseStatusException(HttpStatus.NOT_FOUND)
 
     @PostMapping("/skill")
     fun postSkill(@RequestBody postSkill: PostSkill ) = skillService.createSkill(postSkill.title)
@@ -36,7 +39,7 @@ class ApiController {
     fun getNode(@RequestParam("page") page: Int, @RequestParam("size") size: Int) = nodeService.getNode(page, size)
 
     @GetMapping("/node/{id}")
-    fun getNode(@PathVariable id: String) = nodeService.getNode(id)
+    fun getNode(@PathVariable id: String) = nodeService.getNode(id)?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
 
     @PostMapping("/node")
     fun postNode(@RequestBody postNode: PostNode ) = nodeService.createNode(postNode.skillId, postNode.childrenIds, postNode.parentId)
@@ -45,13 +48,13 @@ class ApiController {
     fun deleteNode(@PathVariable id: String) = nodeService.deleteNode(id)
 
     @PutMapping("/node/{id}")
-    fun replaceNode(@PathVariable id: String, @RequestBody putNode: PutNode) = nodeService.replaceNode(id, putNode.skillId, putNode.childrenIds, putNode.parentId)
+    fun replaceNode(@PathVariable id: String, @RequestBody putNode: PutNode) = nodeService.replaceNode(id, putNode.skillId, putNode.childrenIds, putNode.parentId)?:throw ResponseStatusException(HttpStatus.NOT_FOUND)
 
     @GetMapping("/tree")
     fun getTree(@RequestParam("page") page: Int, @RequestParam("size") size: Int) = treeSerivce.getTree(page, size)
 
     @GetMapping("/tree/{id}")
-    fun getTree(@PathVariable id: String) = treeSerivce.getTree(id)
+    fun getTree(@PathVariable id: String) = treeSerivce.getTree(id)?:throw ResponseStatusException(HttpStatus.NOT_FOUND)
 
     @PostMapping("/tree")
     fun postTree(@RequestBody postTree: PostTree ) = treeSerivce.createTree(postTree)
@@ -60,7 +63,7 @@ class ApiController {
     fun deleteTree(@PathVariable id: String) = treeSerivce.deleteTree(id)
 
     @PutMapping("/tree/{id}")
-    fun replaceTree(@PathVariable id: String, @RequestBody putTree: PutTree) = treeSerivce.replaceTree(id, putTree)
+    fun replaceTree(@PathVariable id: String, @RequestBody putTree: PutTree) = treeSerivce.replaceTree(id, putTree)?:throw ResponseStatusException(HttpStatus.NOT_FOUND)
 }
 
 data class PostSkill(val title: String)

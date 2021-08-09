@@ -2,6 +2,7 @@ package com.belenot.skilltree.service
 
 import com.belenot.skilltree.utils.newUUID
 import com.belenot.skilltree.domain.Node
+import com.belenot.skilltree.domain.Skill
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
@@ -19,10 +20,7 @@ class NodeService {
     fun getNode(page: Int, size: Int) =
         nodes.values.asSequence().chunked(size).drop(page).firstOrNull()?: emptyList()
 
-    fun getNode(id: String) =
-        if (nodes.containsKey(id)) nodes[id]
-        // TODO throw service exception
-        else throw ResponseStatusException(HttpStatus.NOT_FOUND)
+    fun getNode(id: String) = if (nodes.containsKey(id)) nodes[id] else null
 
     fun createNode(skillId: String, childrenIds: List<String> = emptyList(), parentId: String? = null): Node {
         val skill = skillService.getSkill(skillId)
@@ -39,7 +37,7 @@ class NodeService {
 
     fun deleteNode(id: String) = nodes.remove(id)
 
-    fun replaceNode(id: String, skillId: String, childrenIds: List<String> = emptyList(), parentId: String? = null): Node {
+    fun replaceNode(id: String, skillId: String, childrenIds: List<String> = emptyList(), parentId: String? = null): Node? {
         if (nodes.containsKey(id)) {
             val skill = skillService.getSkill(skillId)
             if (skill != null) {
@@ -51,8 +49,7 @@ class NodeService {
                 throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Not found skill with id = ${skillId}.")
             }
         } else {
-            // TODO throw service exception
-            throw ResponseStatusException(HttpStatus.NOT_FOUND)
+            return null
         }
     }
 }

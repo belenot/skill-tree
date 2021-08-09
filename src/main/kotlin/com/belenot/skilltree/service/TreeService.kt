@@ -25,10 +25,7 @@ class TreeService {
     fun getTree(page: Int, size: Int) =
         trees.values.asSequence().chunked(size).drop(page).firstOrNull()?: emptyList()
 
-    fun getTree(id: String) =
-        if (trees.containsKey(id)) trees[id]
-        // TODO throw service exception
-        else throw ResponseStatusException(HttpStatus.NOT_FOUND)
+    fun getTree(id: String) = if (trees.containsKey(id)) trees[id]  else null
 
     fun createTree(postTree: PostTree): Tree {
         val root = nodeService.getNode(postTree.rootId)
@@ -55,7 +52,7 @@ class TreeService {
 
     fun deleteTree(id: String) = trees.remove(id)
 
-    fun replaceTree(id: String, putTree: PutTree): Tree {
+    fun replaceTree(id: String, putTree: PutTree): Tree? {
         if (trees.containsKey(id)) {
             val root = nodeService.getNode(putTree.rootId)
             if (root != null) {
@@ -67,8 +64,7 @@ class TreeService {
                 throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Not found root node with id = ${putTree.rootId}.")
             }
         } else {
-            // TODO throw service exception
-            throw ResponseStatusException(HttpStatus.NOT_FOUND)
+            return null
         }
     }
 }
