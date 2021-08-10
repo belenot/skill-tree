@@ -31,5 +31,5 @@ class SkillService {
     fun replaceSkill(id: String, title: String) =
         if (skills.containsKey(id)) skills.replace(id, Skill(id = id, title = title))
         // TODO throw service exception
-        else throw ResponseStatusException(HttpStatus.NOT_FOUND)
+        else null
 }

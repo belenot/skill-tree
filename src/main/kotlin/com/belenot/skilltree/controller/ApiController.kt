@@ -33,7 +33,7 @@ class ApiController {
     fun deleteSkill(@PathVariable id: String) = skillService.deleteSkill(id)
 
     @PutMapping("/skill/{id}")
-    fun replaceSkill(@PathVariable id: String, @RequestBody putSkill: PutSkill) = skillService.replaceSkill(id, putSkill.title)
+    fun replaceSkill(@PathVariable id: String, @RequestBody putSkill: PutSkill) = skillService.replaceSkill(id, putSkill.title)?:throw ResponseStatusException(HttpStatus.NOT_FOUND)
 
     @GetMapping("/node")
     fun getNode(@RequestParam("page") page: Int, @RequestParam("size") size: Int) = nodeService.getNode(page, size)
