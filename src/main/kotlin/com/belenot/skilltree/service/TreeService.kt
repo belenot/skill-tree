@@ -1,5 +1,6 @@
 package com.belenot.skilltree.service
 
+import com.belenot.skilltree.SkillTreeException
 import com.belenot.skilltree.controller.PostTree
 import com.belenot.skilltree.controller.PutTree
 import com.belenot.skilltree.utils.newUUID
@@ -35,8 +36,8 @@ class TreeService {
             trees[id] = tree
             return tree
         } else {
-            // TODO throw service exception
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Not found root node with id = ${postTree.rootId}.")
+            //
+            throw SkillTreeException("Not found root node with id = ${postTree.rootId}.")
         }
     }
 
@@ -60,8 +61,7 @@ class TreeService {
                 trees[id] = tree
                 return tree
             } else {
-                // TODO throw service exception
-                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Not found root node with id = ${putTree.rootId}.")
+                throw SkillTreeException("Not found root node with id = ${putTree.rootId}.")
             }
         } else {
             return null

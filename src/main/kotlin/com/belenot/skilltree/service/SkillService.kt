@@ -8,14 +8,14 @@ import org.springframework.web.server.ResponseStatusException
 
 
 @Service
-class SkillService {
+open class SkillService {
     // TODO move to repository
     private val skills  = mutableMapOf<String, Skill>()
 
     fun getSkill(page: Int, size: Int) =
         skills.values.asSequence().chunked(size).drop(page).firstOrNull()?: emptyList()
 
-    fun getSkill(id: String) =
+    open fun getSkill(id: String) =
         if (skills.containsKey(id)) skills[id]
         else null
 
@@ -30,6 +30,5 @@ class SkillService {
 
     fun replaceSkill(id: String, title: String) =
         if (skills.containsKey(id)) skills.replace(id, Skill(id = id, title = title))
-        // TODO throw service exception
         else null
 }

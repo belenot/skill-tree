@@ -1,5 +1,6 @@
 package com.belenot.skilltree.service
 
+import com.belenot.skilltree.SkillTreeException
 import com.belenot.skilltree.utils.newUUID
 import com.belenot.skilltree.domain.Node
 import com.belenot.skilltree.domain.Skill
@@ -9,13 +10,11 @@ import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
 
 @Service
-class NodeService {
+class NodeService(val skillService: SkillService) {
 
     // TODO move to repository
     private val nodes  = mutableMapOf<String, Node>()
     // TODO move to constructor
-    @Autowired
-    private lateinit var skillService: SkillService
 
     fun getNode(page: Int, size: Int) =
         nodes.values.asSequence().chunked(size).drop(page).firstOrNull()?: emptyList()
@@ -30,8 +29,7 @@ class NodeService {
             nodes[id] = node
             return node
         } else {
-            // TODO throw service exception
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Not found skill with id = ${skillId}.")
+            throw SkillTreeException("Not found skill with id = ${skillId}")
         }
     }
 
@@ -45,8 +43,7 @@ class NodeService {
                 nodes[id] = node
                 return node
             } else {
-                // TODO throw service exception
-                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Not found skill with id = ${skillId}.")
+                throw SkillTreeException("Not found skill with id = ${skillId}")
             }
         } else {
             return null

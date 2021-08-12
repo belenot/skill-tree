@@ -1,13 +1,20 @@
 package com.belenot.skilltree.controller
 
+import com.belenot.skilltree.SkillTreeException
 import com.belenot.skilltree.domain.Tree
 import com.belenot.skilltree.service.NodeService
 import com.belenot.skilltree.service.SkillService
 import com.belenot.skilltree.service.TreeService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpEntity
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.context.request.WebRequest
 import org.springframework.web.server.ResponseStatusException
+import java.net.http.HttpResponse
+import javax.servlet.ServletResponse
+import javax.servlet.http.HttpServletResponse
 
 @RestController
 class ApiController {
@@ -64,6 +71,11 @@ class ApiController {
 
     @PutMapping("/tree/{id}")
     fun replaceTree(@PathVariable id: String, @RequestBody putTree: PutTree) = treeSerivce.replaceTree(id, putTree)?:throw ResponseStatusException(HttpStatus.NOT_FOUND)
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    fun exceptionHandler(exc: SkillTreeException) {}
+
 }
 
 data class PostSkill(val title: String)
