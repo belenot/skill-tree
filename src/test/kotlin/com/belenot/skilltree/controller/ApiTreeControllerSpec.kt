@@ -17,7 +17,7 @@ import java.lang.IllegalStateException
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class ApiTreeControllerTest {
+class ApiTreeControllerSpec {
     @Autowired
     lateinit var restTemplate: TestRestTemplate
     @Autowired
