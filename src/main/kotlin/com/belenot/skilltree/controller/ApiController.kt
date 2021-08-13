@@ -49,13 +49,13 @@ class ApiController {
     fun getNode(@PathVariable id: String) = nodeService.getNode(id)?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
 
     @PostMapping("/node")
-    fun postNode(@RequestBody postNode: PostNode ) = nodeService.createNode(postNode.skillId, postNode.childrenIds, postNode.parentId)
+    fun postNode(@RequestBody postNode: PostNode ) = nodeService.createNode(postNode.skillId, postNode.childrenIds.toSet(), postNode.parentId)
 
     @DeleteMapping("/node/{id}")
     fun deleteNode(@PathVariable id: String) = nodeService.deleteNode(id)
 
     @PutMapping("/node/{id}")
-    fun replaceNode(@PathVariable id: String, @RequestBody putNode: PutNode) = nodeService.replaceNode(id, putNode.skillId, putNode.childrenIds, putNode.parentId)?:throw ResponseStatusException(HttpStatus.NOT_FOUND)
+    fun replaceNode(@PathVariable id: String, @RequestBody putNode: PutNode) = nodeService.replaceNode(id, putNode.skillId, putNode.childrenIds.toSet(), putNode.parentId)?:throw ResponseStatusException(HttpStatus.NOT_FOUND)
 
     @GetMapping("/tree")
     fun getTree(@RequestParam("page") page: Int, @RequestParam("size") size: Int) = treeSerivce.getTree(page, size)

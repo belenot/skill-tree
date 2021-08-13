@@ -10,21 +10,17 @@ import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
 
 @Service
-class NodeService(val skillService: SkillService) {
-
-    // TODO move to repository
-    private val nodes  = mutableMapOf<String, Node>()
-    // TODO move to constructor
+class NodeService(val nodes: MutableMap<String, Node>, val skillService: SkillService) {
 
     fun getNode(page: Int, size: Int) =
         nodes.values.asSequence().chunked(size).drop(page).firstOrNull()?: emptyList()
 
     fun getNode(id: String) = if (nodes.containsKey(id)) nodes[id] else null
 
-    fun createNode(skillId: String, childrenIds: List<String> = emptyList(), parentId: String? = null): Node {
+    fun createNode(skillId: String, childrenIds: Set<String> = emptySet(), parentId: String? = null): Node {
         val skill = skillService.getSkill(skillId)
         if (skill != null) {
-            val node = Node(newUUID(), children = childrenIds.mapNotNull { nodes[it] }, skill = skill, parent = nodes[parentId])
+            val node = Node(newUUID(), children = childrenIds.mapNotNull { nodes[it] }.toSet(), skill = skill, parent = nodes[parentId])
             val id = node.id
             nodes[id] = node
             return node
@@ -35,11 +31,11 @@ class NodeService(val skillService: SkillService) {
 
     fun deleteNode(id: String) = nodes.remove(id)
 
-    fun replaceNode(id: String, skillId: String, childrenIds: List<String> = emptyList(), parentId: String? = null): Node? {
+    fun replaceNode(id: String, skillId: String, childrenIds: Set<String> = emptySet(), parentId: String? = null): Node? {
         if (nodes.containsKey(id)) {
             val skill = skillService.getSkill(skillId)
             if (skill != null) {
-                val node = Node(id, children = childrenIds.mapNotNull { nodes[it] }, skill = skill, parent = nodes[parentId])
+                val node = Node(id, children = childrenIds.mapNotNull { nodes[it] }.toSet(), skill = skill, parent = nodes[parentId])
                 nodes[id] = node
                 return node
             } else {
