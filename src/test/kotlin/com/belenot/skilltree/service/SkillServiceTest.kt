@@ -15,9 +15,25 @@ class SkillServiceTest {
     }
 
     @Test
-    fun `Given initializetd When get skills Then return empty list`() {
+    fun `Given initialized When get skills Then return empty list`() {
         val skills = skillService.getSkill(0, 1)
         assertThat(skills).isEmpty()
+    }
+
+    @Test
+    fun `Given negative or zero page or size When get skills Then throw Exception`() {
+        assertThatThrownBy { skillService.getSkill(-1, 1) }
+            .isExactlyInstanceOf(SkillTreeException::class.java)
+            .hasMessage(SkillService.GET_SKILL_VALIDATION_VIOLATION)
+        assertThatThrownBy { skillService.getSkill(1, -1) }
+            .isExactlyInstanceOf(SkillTreeException::class.java)
+            .hasMessage(SkillService.GET_SKILL_VALIDATION_VIOLATION)
+        assertThatThrownBy { skillService.getSkill(-1, -1) }
+            .isExactlyInstanceOf(SkillTreeException::class.java)
+            .hasMessage(SkillService.GET_SKILL_VALIDATION_VIOLATION)
+        assertThatThrownBy { skillService.getSkill(1, 0) }
+            .isExactlyInstanceOf(SkillTreeException::class.java)
+            .hasMessage(SkillService.GET_SKILL_VALIDATION_VIOLATION)
     }
 
     @Test
@@ -57,6 +73,13 @@ class SkillServiceTest {
     fun `Given non existing id When get skill Then return null`() {
         val skill = skillService.getSkill(newUUID())
         assertThat(skill).isNull()
+    }
+
+    @Test
+    fun `When get skill Then return Skill`() {
+        val skill = skillService.createSkill("new skill")
+        val actualSkill = skillService.getSkill(skill.id)
+        assertThat(actualSkill).isEqualTo(skill)
     }
 
     // TODO add more tests
