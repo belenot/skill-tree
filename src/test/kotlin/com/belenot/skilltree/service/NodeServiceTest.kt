@@ -46,9 +46,9 @@ class NodeServiceTest {
     }
 
     @Test
-    fun `When get nodes Then return empty list`() {
-        val nodes = nodeService.getNode(0, 1)
-        assertThat(nodes).isEmpty()
+    fun `When get nodes Then return nodes collection`() {
+        val actualnodes = nodeService.getNode(0, 1)
+        assertThat(actualnodes).isNotNull()
     }
 
     @Test

@@ -4,6 +4,7 @@ import com.belenot.skilltree.SkillTreeException
 import com.belenot.skilltree.utils.newUUID
 import com.belenot.skilltree.domain.Node
 import com.belenot.skilltree.domain.Skill
+import com.belenot.skilltree.utils.paged
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
@@ -12,8 +13,7 @@ import org.springframework.web.server.ResponseStatusException
 @Service
 open class NodeService(val nodes: MutableMap<String, Node>, val skillService: SkillService) {
 
-    open fun getNode(page: Int, size: Int) =
-        nodes.values.asSequence().chunked(size).drop(page).firstOrNull()?: emptyList()
+    open fun getNode(page: Int, size: Int) = paged(nodes.values, page, size)
 
     open fun getNode(id: String) = if (nodes.containsKey(id)) nodes[id] else null
 

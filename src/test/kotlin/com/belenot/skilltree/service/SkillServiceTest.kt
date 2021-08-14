@@ -1,6 +1,7 @@
 package com.belenot.skilltree.service
 
 import com.belenot.skilltree.SkillTreeException
+import com.belenot.skilltree.utils.PAGING_VALIDATION_VIOLATION
 import com.belenot.skilltree.utils.newUUID
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -15,25 +16,9 @@ class SkillServiceTest {
     }
 
     @Test
-    fun `Given initialized When get skills Then return empty list`() {
-        val skills = skillService.getSkill(0, 1)
-        assertThat(skills).isEmpty()
-    }
-
-    @Test
-    fun `Given negative or zero page or size When get skills Then throw Exception`() {
-        assertThatThrownBy { skillService.getSkill(-1, 1) }
-            .isExactlyInstanceOf(SkillTreeException::class.java)
-            .hasMessage(SkillService.GET_SKILL_VALIDATION_VIOLATION)
-        assertThatThrownBy { skillService.getSkill(1, -1) }
-            .isExactlyInstanceOf(SkillTreeException::class.java)
-            .hasMessage(SkillService.GET_SKILL_VALIDATION_VIOLATION)
-        assertThatThrownBy { skillService.getSkill(-1, -1) }
-            .isExactlyInstanceOf(SkillTreeException::class.java)
-            .hasMessage(SkillService.GET_SKILL_VALIDATION_VIOLATION)
-        assertThatThrownBy { skillService.getSkill(1, 0) }
-            .isExactlyInstanceOf(SkillTreeException::class.java)
-            .hasMessage(SkillService.GET_SKILL_VALIDATION_VIOLATION)
+    fun `When get skills Then return skills collection`() {
+        val actualSkills = skillService.getSkill(0, 1)
+        assertThat(actualSkills).isNotNull()
     }
 
     @Test

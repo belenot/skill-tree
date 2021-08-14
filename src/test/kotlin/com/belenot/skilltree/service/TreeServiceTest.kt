@@ -4,6 +4,7 @@ import com.belenot.skilltree.SkillTreeException
 import com.belenot.skilltree.domain.Node
 import com.belenot.skilltree.domain.Skill
 import com.belenot.skilltree.domain.Tree
+import com.belenot.skilltree.utils.PAGING_VALIDATION_VIOLATION
 import com.belenot.skilltree.utils.newUUID
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
@@ -29,37 +30,11 @@ class TreeServiceTest {
     }
 
     @Test
-    fun `Given empty tree collection When get trees Then return empty collection`() {
-        val trees = treeService.getTree(0, 1)
-        assertThat(trees).isEmpty()
+    fun `When get nodes Then return nodes collection`() {
+        val actualNodes = nodeService.getNode(0, 1)
+        assertThat(actualNodes).isNotNull()
     }
 
-    @Test
-    fun `Given non empty tree collection When get trees Then return paged collection`() {
-        val cachedTrees = generateSequence {
-            Tree(newUUID(), Node(newUUID(), skill = Skill(newUUID(), "skill=${newUUID()}")), "")
-        }.take(20).toList()
-        trees.putAll(cachedTrees.map { it.id to it })
-        val trees = treeService.getTree(0, 10)
-        assertThat(trees).isEqualTo(cachedTrees.take(10))
-
-    }
-
-    @Test
-    fun `Given negative or zero page or size When get skills Then throw Exception`() {
-        assertThatThrownBy { treeService.getTree(-1, 1) }
-            .isExactlyInstanceOf(SkillTreeException::class.java)
-            .hasMessage(TreeService.GET_TREE_VALIDATION_VIOLATION)
-        assertThatThrownBy { treeService.getTree(1, -1) }
-            .isExactlyInstanceOf(SkillTreeException::class.java)
-            .hasMessage(TreeService.GET_TREE_VALIDATION_VIOLATION)
-        assertThatThrownBy { treeService.getTree(-1, -1) }
-            .isExactlyInstanceOf(SkillTreeException::class.java)
-            .hasMessage(TreeService.GET_TREE_VALIDATION_VIOLATION)
-        assertThatThrownBy { treeService.getTree(1, 0) }
-            .isExactlyInstanceOf(SkillTreeException::class.java)
-            .hasMessage(TreeService.GET_TREE_VALIDATION_VIOLATION)
-    }
 
     @Test
     fun `When get tree Then return tree`() {
