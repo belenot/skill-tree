@@ -10,14 +10,14 @@ import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
 
 @Service
-class NodeService(val nodes: MutableMap<String, Node>, val skillService: SkillService) {
+open class NodeService(val nodes: MutableMap<String, Node>, val skillService: SkillService) {
 
-    fun getNode(page: Int, size: Int) =
+    open fun getNode(page: Int, size: Int) =
         nodes.values.asSequence().chunked(size).drop(page).firstOrNull()?: emptyList()
 
-    fun getNode(id: String) = if (nodes.containsKey(id)) nodes[id] else null
+    open fun getNode(id: String) = if (nodes.containsKey(id)) nodes[id] else null
 
-    fun createNode(skillId: String, childrenIds: Set<String> = emptySet(), parentId: String? = null): Node {
+    open fun createNode(skillId: String, childrenIds: Set<String> = emptySet(), parentId: String? = null): Node {
         val skill = skillService.getSkill(skillId)
         if (skill != null) {
             val node = Node(newUUID(), children = childrenIds.mapNotNull { nodes[it] }.toSet(), skill = skill, parent = nodes[parentId])
@@ -29,9 +29,9 @@ class NodeService(val nodes: MutableMap<String, Node>, val skillService: SkillSe
         }
     }
 
-    fun deleteNode(id: String) = nodes.remove(id)
+    open fun deleteNode(id: String) = nodes.remove(id)
 
-    fun replaceNode(id: String, skillId: String, childrenIds: Set<String> = emptySet(), parentId: String? = null): Node? {
+    open fun replaceNode(id: String, skillId: String, childrenIds: Set<String> = emptySet(), parentId: String? = null): Node? {
         if (nodes.containsKey(id)) {
             val skill = skillService.getSkill(skillId)
             if (skill != null) {

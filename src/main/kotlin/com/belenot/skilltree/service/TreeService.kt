@@ -12,56 +12,43 @@ import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
 
 @Service
-class TreeService {
+class TreeService(val trees: MutableMap<String, Tree>, val nodeService: NodeService, val skillService: SkillService) {
 
-    // TODO move to repository
-    private val trees   = mutableMapOf<String, Tree>()
+    companion object {
+        @JvmStatic
+        val GET_TREE_VALIDATION_VIOLATION = "Page must be greater then or equal zero and size must be greater then zero."
+    }
 
-    // TODO move to constructor
-    @Autowired
-    private lateinit var nodeService: NodeService
-    @Autowired
-    private lateinit var skillService: SkillService
-
-    fun getTree(page: Int, size: Int) =
-        trees.values.asSequence().chunked(size).drop(page).firstOrNull()?: emptyList()
+    // TODO extract paging to utility method
+    fun getTree(page: Int, size: Int) = if (page < 0 || size <= 0)
+        throw SkillTreeException(GET_TREE_VALIDATION_VIOLATION)
+        else trees.values.asSequence().chunked(size).drop(page).firstOrNull()?: emptyList()
 
     fun getTree(id: String) = if (trees.containsKey(id)) trees[id]  else null
 
-    fun createTree(postTree: PostTree): Tree {
-        val root = nodeService.getNode(postTree.rootId)
+    fun createTree(rootId: String, description: String): Tree {
+        val root = nodeService.getNode(rootId)
         if (root != null) {
-            val tree = createTree(postTree, root)
+            val tree = Tree(id = newUUID(), root = root, description = description)
             val id = tree.id
             trees[id] = tree
             return tree
         } else {
-            //
-            throw SkillTreeException("Not found root node with id = ${postTree.rootId}.")
+            throw SkillTreeException("Not found root node with id = ${rootId}.")
         }
     }
 
-    private fun createTree(
-        postTree: PostTree,
-        root: Node,
-        id: String = newUUID()
-    ) = Tree(
-        id = id,
-        root = root,
-        description = postTree.description
-    )
-
     fun deleteTree(id: String) = trees.remove(id)
 
-    fun replaceTree(id: String, putTree: PutTree): Tree? {
+    fun replaceTree(id: String, rootId: String, description: String): Tree? {
         if (trees.containsKey(id)) {
-            val root = nodeService.getNode(putTree.rootId)
+            val root = nodeService.getNode(rootId)
             if (root != null) {
-                val tree = createTree(putTree, root, id = id)
+                val tree = Tree(id = id, root = root, description = description)
                 trees[id] = tree
                 return tree
             } else {
-                throw SkillTreeException("Not found root node with id = ${putTree.rootId}.")
+                throw SkillTreeException("Not found root node with id = ${rootId}.")
             }
         } else {
             return null

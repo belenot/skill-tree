@@ -64,13 +64,13 @@ class ApiController {
     fun getTree(@PathVariable id: String) = treeSerivce.getTree(id)?:throw ResponseStatusException(HttpStatus.NOT_FOUND)
 
     @PostMapping("/tree")
-    fun postTree(@RequestBody postTree: PostTree ) = treeSerivce.createTree(postTree)
+    fun postTree(@RequestBody postTree: PostTree ) = treeSerivce.createTree(postTree.rootId, postTree.description)
 
     @DeleteMapping("/tree/{id}")
     fun deleteTree(@PathVariable id: String) = treeSerivce.deleteTree(id)
 
     @PutMapping("/tree/{id}")
-    fun replaceTree(@PathVariable id: String, @RequestBody putTree: PutTree) = treeSerivce.replaceTree(id, putTree)?:throw ResponseStatusException(HttpStatus.NOT_FOUND)
+    fun replaceTree(@PathVariable id: String, @RequestBody putTree: PutTree) = treeSerivce.replaceTree(id, putTree.rootId, putTree.description)?:throw ResponseStatusException(HttpStatus.NOT_FOUND)
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)

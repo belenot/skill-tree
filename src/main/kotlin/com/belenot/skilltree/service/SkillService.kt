@@ -17,7 +17,7 @@ open class SkillService {
     // TODO move to repository
     private val skills  = mutableMapOf<String, Skill>()
 
-    fun getSkill(page: Int, size: Int) = if (page < 0 || size <= 0)
+    open fun getSkill(page: Int, size: Int) = if (page < 0 || size <= 0)
         throw SkillTreeException(GET_SKILL_VALIDATION_VIOLATION)
         else skills.values.asSequence().chunked(size).drop(page).firstOrNull()?: emptyList()
 
@@ -25,16 +25,16 @@ open class SkillService {
         if (skills.containsKey(id)) skills[id]
         else null
 
-    fun createSkill(title: String): Skill {
+    open fun createSkill(title: String): Skill {
         val id = newUUID()
         val skill = Skill(id = id, title = title)
         skills.put(id, skill)
         return skill
     }
 
-    fun deleteSkill(id: String) = skills.remove(id)
+    open fun deleteSkill(id: String) = skills.remove(id)
 
-    fun replaceSkill(id: String, title: String) =
+    open fun replaceSkill(id: String, title: String) =
         if (skills.containsKey(id)) skills.replace(id, Skill(id = id, title = title))
         else null
 }
