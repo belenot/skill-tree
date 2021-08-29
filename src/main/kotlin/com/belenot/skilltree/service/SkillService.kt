@@ -3,6 +3,7 @@ package com.belenot.skilltree.service
 import com.belenot.skilltree.SkillTreeException
 import com.belenot.skilltree.utils.newUUID
 import com.belenot.skilltree.domain.Skill
+import com.belenot.skilltree.repository.SkillRepository
 import com.belenot.skilltree.utils.paged
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
@@ -10,14 +11,13 @@ import org.springframework.web.server.ResponseStatusException
 
 
 @Service
-open class SkillService {
-    // TODO move to repository
-    private val skills  = mutableMapOf<String, Skill>()
+open class SkillService(val skillRepository: SkillRepository) {
 
-    open fun getSkill(page: Int, size: Int) = paged(skills.values, page, size)
+
+    open fun getSkill(page: Int, size: Int) = skillRepository.getSkill(page, size)
 
     open fun getSkill(id: String) =
-        if (skills.containsKey(id)) skills[id]
+        if (skillRepository.containsId(id)) skillRepository.getSkill(id)
         else null
 
     open fun createSkill(title: String): Skill {

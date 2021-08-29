@@ -1,0 +1,7 @@
+# emacs trash-files
+\#*
+*~
+.idea
+/out
+/.gradle
+/build
