@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository
 
 @Repository
 open class SkillRepository(
-    private val skills: MutableMap<String, Skill>) {
+    private val skills: MutableMap<String, Skill> = mutableMapOf()) {
 
 
     open fun getSkill(page: Int, size: Int): List<Skill> = paged(skills.values, page, size)

@@ -1,14 +1,14 @@
 package com.belenot.skilltree.service
 
-import com.belenot.skilltree.SkillTreeException
+import com.belenot.skilltree.domain.Skill
 import com.belenot.skilltree.repository.SkillRepository
-import com.belenot.skilltree.utils.PAGING_VALIDATION_VIOLATION
 import com.belenot.skilltree.utils.newUUID
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.assertj.core.api.Assertions.*
 import org.mockito.Mockito.any
-import org.mockito.Mockito.anyString
+import org.mockito.Mockito.anyInt
+import org.mockito.Mockito.doReturn
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.spy
 import org.mockito.Mockito.times
@@ -20,70 +20,48 @@ class SkillServiceTest {
 
     @BeforeEach
     fun beforeEach() {
-        // skillRepository = SkillRepository(mutableMapOf())
-        skillRepository = spy(SkillRepository(mutableMapOf()))
+        skillRepository = mock(SkillRepository::class.java)
+        doReturn(listOf<Skill>()).`when`(skillRepository).getSkill(anyInt(), anyInt())
         skillService = SkillService(skillRepository)
     }
 
     @Test
-    fun `When get skills Then return skills collection`() {
-        val actualSkills = skillService.getSkill(0, 1)
+    fun `When get skills Then call skillRepository getSkill`() {
+        skillService.getSkill(0, 1)
         verify(skillRepository, times(1)).getSkill(0, 1)
-        assertThat(actualSkills).isNotNull()
     }
 
     @Test
-    fun `Given new skill When create skill Then save skill`() {
-        val createdSkill = skillService.createSkill("title")
-        assertThat(createdSkill.id).isNotBlank()
-        assertThat(createdSkill.title).isEqualTo("title")
+    fun `Given new skill When create skill Then call skillRepository createSkill`() {
+        doReturn(Skill(newUUID(), "title")).`when`(skillRepository).createSkill("title")
+        skillService.createSkill("title")
         verify(skillRepository, times(1)).createSkill("title")
     }
 
     @Test
-    fun `When delete skill Then delete skill`() {
-        val skillForDeletion = skillService.createSkill("skill for deletion")
-        val deletedSkill = skillService.deleteSkill(skillForDeletion.id)
-        assertThat(deletedSkill).isNotNull()
-        assertThat(deletedSkill?.id).isEqualTo(skillForDeletion.id)
-        assertThat(deletedSkill?.title).isEqualTo(skillForDeletion.title)
+    fun `When delete skill Then call skillRepositry deleteSkill`() {
+        val skillForDeletion = Skill(newUUID(), "skill for deletion")
+        doReturn(Skill(skillForDeletion.id, skillForDeletion.title))
+            .`when`(skillRepository)
+            .deleteSkill(skillForDeletion.id)
+        skillService.deleteSkill(skillForDeletion.id)
         verify(skillRepository, times(1)).deleteSkill(skillForDeletion.id)
     }
 
     @Test
-    fun `When update skill Then update skill`() {
-        val skillForUpdate = skillService.createSkill("skill for update")
-        val previousSkill = skillService.replaceSkill(skillForUpdate.id, "updated title")
-        assertThat(previousSkill).isNotNull()
-        assertThat(previousSkill!!).isEqualTo(skillForUpdate)
-        val updatedSkill = skillService.getSkill(previousSkill.id)
-        assertThat(updatedSkill).isNotNull()
-        assertThat(updatedSkill?.id).isEqualTo(previousSkill.id)
-        verify(skillRepository, times(1)).updateSkill(skillForUpdate.id, "updated title")
+    fun `When replace skill Then call skillRepository updateSkill`() {
+        val skill = Skill(newUUID(), "updated title")
+        skillService.replaceSkill(skill.id, skill.title)
+        verify(skillRepository, times(1))
+            .updateSkill(skill.id, skill.title)
     }
 
     @Test
-    fun `Given non existing id When update skill Then return null`() {
-        val id = newUUID()
-        val updatedSkill = skillService.replaceSkill(id, "title")
-        assertThat(updatedSkill).isNull()
-        verify(skillRepository, times(1)).updateSkill(id, "title")
-    }
-
-    @Test
-    fun `Given non existing id When get skill Then return null`() {
-        val id = newUUID()
-        val skill = skillService.getSkill(id)
-        assertThat(skill).isNull()
-        verify(skillRepository, times(1)).getSkill(id)
-    }
-
-    @Test
-    fun `When get skill Then return Skill`() {
-        val skill = skillService.createSkill("new skill")
-        val actualSkill = skillService.getSkill(skill.id)
-        assertThat(actualSkill).isEqualTo(skill)
-        verify(skillRepository).getSkill(skill.id)
+    fun `When get skill Then call skillRepository getSkill`() {
+        val skill = Skill(newUUID(), "title")
+        doReturn(skill).`when`(skillRepository).getSkill(skill.id)
+        skillService.getSkill(skill.id)
+        verify(skillRepository, times(1)).getSkill(skill.id)
     }
 
     // TODO add more tests
