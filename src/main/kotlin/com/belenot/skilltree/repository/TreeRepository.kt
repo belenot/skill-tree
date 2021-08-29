@@ -1,8 +1,6 @@
 package com.belenot.skilltree.repository
 
-import com.belenot.skilltree.SkillTreeException
 import com.belenot.skilltree.domain.Node
-import com.belenot.skilltree.domain.Skill
 import com.belenot.skilltree.domain.Tree
 import com.belenot.skilltree.utils.newUUID
 import com.belenot.skilltree.utils.paged

@@ -1,14 +1,8 @@
 package com.belenot.skilltree.service
 
-import com.belenot.skilltree.SkillTreeException
-import com.belenot.skilltree.utils.newUUID
 import com.belenot.skilltree.domain.Skill
 import com.belenot.skilltree.repository.SkillRepository
-import com.belenot.skilltree.utils.paged
-import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
-import org.springframework.web.server.ResponseStatusException
-
 
 @Service
 open class SkillService(val skillRepository: SkillRepository) {

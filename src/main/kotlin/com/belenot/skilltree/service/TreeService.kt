@@ -1,17 +1,9 @@
 package com.belenot.skilltree.service
 
 import com.belenot.skilltree.SkillTreeException
-import com.belenot.skilltree.controller.PostTree
-import com.belenot.skilltree.controller.PutTree
-import com.belenot.skilltree.utils.newUUID
-import com.belenot.skilltree.domain.Node
 import com.belenot.skilltree.domain.Tree
 import com.belenot.skilltree.repository.TreeRepository
-import com.belenot.skilltree.utils.paged
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
-import org.springframework.web.server.ResponseStatusException
 
 @Service
 class TreeService(val treeRepository: TreeRepository, val nodeService: NodeService, val skillService: SkillService) {
