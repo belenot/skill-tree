@@ -15,13 +15,12 @@ class NodeServiceTest {
 
     lateinit var nodeService: NodeService
     lateinit var skillService: SkillService
-    lateinit var nodes: MutableMap<String, Node>
+
     lateinit var nodeRepository: NodeRepository
 
     @BeforeEach
     fun beforeEach() {
         skillService = mock(SkillService::class.java)
-        nodes = mutableMapOf()
         nodeRepository = mock(NodeRepository::class.java)
         nodeService = NodeService(nodeRepository, skillService)
     }
@@ -89,7 +88,6 @@ class NodeServiceTest {
         doReturn(node).`when`(nodeRepository).getNode(node.id)
         doReturn(true).`when`(nodeRepository).exists(node.id)
         doReturn(null).`when`(skillService).getSkill(skill.id)
-        nodes[node.id] = node
         assertThatThrownBy { nodeService.replaceNode(node.id, skillId = skill.id) }
             .hasMessage("Not found skill with id = ${skill.id}")
     }
