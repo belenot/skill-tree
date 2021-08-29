@@ -4,6 +4,7 @@ import com.belenot.skilltree.SkillTreeException
 import com.belenot.skilltree.domain.Node
 import com.belenot.skilltree.domain.Skill
 import com.belenot.skilltree.domain.Tree
+import com.belenot.skilltree.repository.TreeRepository
 import com.belenot.skilltree.utils.PAGING_VALIDATION_VIOLATION
 import com.belenot.skilltree.utils.newUUID
 import org.assertj.core.api.Assertions
@@ -20,13 +21,15 @@ class TreeServiceTest {
     lateinit var trees: MutableMap<String, Tree>
     lateinit var skillService: SkillService
     lateinit var nodeService: NodeService
+    lateinit var treeRepository: TreeRepository
 
     @BeforeEach
     fun beforeEach() {
         trees = mutableMapOf()
         skillService = mock(SkillService::class.java)
         nodeService = mock(NodeService::class.java)
-        treeService = TreeService(trees, nodeService, skillService)
+        treeRepository = TreeRepository(trees)
+        treeService = TreeService(treeRepository, nodeService, skillService)
     }
 
     @Test

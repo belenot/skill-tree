@@ -6,6 +6,7 @@ import com.belenot.skilltree.controller.PutTree
 import com.belenot.skilltree.utils.newUUID
 import com.belenot.skilltree.domain.Node
 import com.belenot.skilltree.domain.Tree
+import com.belenot.skilltree.repository.TreeRepository
 import com.belenot.skilltree.utils.paged
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
@@ -13,34 +14,28 @@ import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
 
 @Service
-class TreeService(val trees: MutableMap<String, Tree>, val nodeService: NodeService, val skillService: SkillService) {
+class TreeService(val treeRepository: TreeRepository, val nodeService: NodeService, val skillService: SkillService) {
 
-    // TODO extract paging to utility method
-    fun getTree(page: Int, size: Int) = paged(trees.values, page, size)
+    fun getTree(page: Int, size: Int) = treeRepository.getTree(page, size)
 
-    fun getTree(id: String) = if (trees.containsKey(id)) trees[id]  else null
+    fun getTree(id: String) = treeRepository.getTree(id)
 
     fun createTree(rootId: String, description: String): Tree {
         val root = nodeService.getNode(rootId)
         if (root != null) {
-            val tree = Tree(id = newUUID(), root = root, description = description)
-            val id = tree.id
-            trees[id] = tree
-            return tree
+            return treeRepository.createTree(description, root)
         } else {
             throw SkillTreeException("Not found root node with id = ${rootId}.")
         }
     }
 
-    fun deleteTree(id: String) = trees.remove(id)
+    fun deleteTree(id: String): Tree? = treeRepository.removeTree(id)
 
     fun replaceTree(id: String, rootId: String, description: String): Tree? {
-        if (trees.containsKey(id)) {
+        if (treeRepository.exists(id)) {
             val root = nodeService.getNode(rootId)
             if (root != null) {
-                val tree = Tree(id = id, root = root, description = description)
-                trees[id] = tree
-                return tree
+                return treeRepository.updateTree(id, description, root)
             } else {
                 throw SkillTreeException("Not found root node with id = ${rootId}.")
             }
