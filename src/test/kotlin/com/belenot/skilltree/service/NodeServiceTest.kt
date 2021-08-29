@@ -3,6 +3,7 @@ package com.belenot.skilltree.service
 import com.belenot.skilltree.SkillTreeException
 import com.belenot.skilltree.domain.Node
 import com.belenot.skilltree.domain.Skill
+import com.belenot.skilltree.generateNodes
 import com.belenot.skilltree.repository.NodeRepository
 import com.belenot.skilltree.utils.newUUID
 import org.assertj.core.api.Assertions.*
@@ -21,7 +22,7 @@ class NodeServiceTest {
     fun beforeEach() {
         skillService = mock(SkillService::class.java)
         nodes = mutableMapOf()
-        nodeRepository = NodeRepository(nodes)
+        nodeRepository = mock(NodeRepository::class.java)
         nodeService = NodeService(nodeRepository, skillService)
     }
 
@@ -33,195 +34,65 @@ class NodeServiceTest {
     }
 
     @Test
-    fun `When get node Then return node`() {
+    fun `When create node Then call nodeRepository createNode`() {
         val skill = Skill(newUUID(), "skill")
+        val node = Node(newUUID(), skill = skill)
         doReturn(skill).`when`(skillService).getSkill(skill.id)
-        val node = nodeService.createNode(skill.id)
-        assertThat(node.id).isNotBlank()
-        assertThat(node.skill.id).isEqualTo(skill.id)
-        assertThat(node.skill.title).isEqualTo(skill.title)
+        doReturn(node).`when`(nodeRepository).createNode(emptySet(), skill, null)
+        val createdNode = nodeService.createNode(skill.id)
+        assertThat(createdNode.id).isNotBlank()
+        assertThat(createdNode.skill.id).isEqualTo(skill.id)
+        assertThat(createdNode.skill.title).isEqualTo(skill.title)
+        verify(nodeRepository, times(1)).createNode(emptySet(), skill, null)
     }
 
     @Test
-    fun `Given non existing id When get node Then return null`() {
-        val node = nodeService.getNode(newUUID())
-        assertThat(node).isNull()
+    fun `When get nodes Then call nodeRepository getNodwes`() {
+        nodeService.getNode(0, 1)
+        verify(nodeRepository, times(1)).getNode(0, 1)
     }
 
     @Test
-    fun `When get nodes Then return nodes collection`() {
-        val actualnodes = nodeService.getNode(0, 1)
-        assertThat(actualnodes).isNotNull()
-    }
-
-    @Test
-    fun `When create node Then return new node without children and parent`() {
-        val skill = Skill(newUUID(), "new skill")
-        doReturn(skill).`when`(skillService).getSkill(skill.id)
-        val node = nodeService.createNode(skill.id)
-        assertThat(node.id).isNotBlank()
-        assertThat(node.skill).isEqualTo(skill)
-        assertThat(node.children).isEmpty()
-        assertThat(node.parent).isNull()
-    }
-
-    @Test
-    fun `Given parent When create node Then return new node without children but with parent`() {
-        val parentSkill = Skill(newUUID(), "parent skill")
-        val skill = Skill(newUUID(), "new skill")
-        val parentNode = Node(newUUID(), skill = parentSkill)
-        doReturn(skill).`when`(skillService).getSkill(skill.id)
-        nodes[parentNode.id] = parentNode
-        val node = nodeService.createNode(skill.id, parentId = parentNode.id)
-        assertThat(node.id).isNotBlank()
-        assertThat(node.skill).isEqualTo(skill)
-        assertThat(node.children).isEmpty()
-        assertThat(node.parent).isEqualTo(parentNode)
-    }
-
-    @Test
-    fun `Given children When create node Then return new node with children but without parent`() {
-        val children = generateNodes()
-        nodes.putAll(children)
-        val skill = Skill(newUUID(), "new skill")
-        doReturn(skill).`when`(skillService).getSkill(skill.id)
-        val node = nodeService.createNode(skill.id, childrenIds = children.keys)
-        assertThat(node.id).isNotBlank()
-        assertThat(node.skill).isEqualTo(skill)
-        assertThat(node.children).isEqualTo(children.values)
-    }
-
-    @Test
-    fun `When delete Node then remove node`() {
+    fun `When delete Node then call nodeRepository removeNode`() {
         val node = Node(newUUID(), skill = Skill(newUUID(), ""))
-        nodes[node.id] = node
-        assertThat(nodes).containsKey(node.id)
-        val deletedNode = nodeService.deleteNode(node.id)
-        assertThat(deletedNode).isEqualTo(node)
-        assertThat(nodes).doesNotContainKey(node.id)
+        nodeService.deleteNode(node.id)
+        verify(nodeRepository, times(1)).removeNode(node.id)
     }
 
     @Test
-    fun `Given non existing id When delete node Then return null and do nothing with collection`() {
-        val nodesBeforeDeletion = nodes.map { it }
-        val removedNode = nodeService.deleteNode(newUUID())
-        val nodesAfterDeletion = nodes.toList().map { it }
-        assertThat(nodesAfterDeletion).isEqualTo(nodesBeforeDeletion)
-        assertThat(removedNode).isNull()
-    }
-
-    @Test
-    fun `Given identical parameters When replace node Then replace Node idempotent`() {
+    fun `When replace node Then call nodeRepository updateNode`() {
         val skill = Skill(newUUID(), "")
         val node = Node(newUUID(), skill = skill)
         doReturn(skill).`when`(skillService).getSkill(skill.id)
-        nodes[node.id] = node
-        val replacedNode = nodeService.replaceNode(node.id, skillId = node.skill.id)
-        assertThat(replacedNode).isEqualTo(node)
+        doReturn(true).`when`(nodeRepository).exists(node.id)
+        doReturn(node).`when`(nodeRepository).updateNode(node.id, skill = skill)
+        nodeService.replaceNode(node.id, skillId = node.skill.id)
+        verify(skillService, times(1)).getSkill(skill.id)
+        verify(nodeRepository, times(1)).exists(node.id)
+        verify(nodeRepository, times(1)).updateNode(node.id, skill = skill)
     }
 
     @Test
-    fun `Given node without parent When replace node with parent Then replace Node with parent`() {
-        val skill = Skill(newUUID(), "skill")
-        val node = Node(newUUID(), skill = skill)
-        val parentSkill = Skill(newUUID(), "parent skill")
-        val parentNode = Node(newUUID(), skill = parentSkill)
-        doReturn(skill).`when`(skillService).getSkill(skill.id)
-        nodes[node.id] = node
-        nodes[parentNode.id] = parentNode
-        val replacedNode = nodeService.replaceNode(node.id, skillId = node.skill.id, parentId = parentNode.id)
-        assertThat(replacedNode).isNotNull()
-        assertThat(replacedNode).isNotEqualTo(node)
-        assertThat(replacedNode).isNotNull()
-        assertThat(replacedNode?.parent).isEqualTo(parentNode)
-        assertThat(nodes[replacedNode?.id]).isEqualTo(replacedNode)
-    }
-
-    @Test
-    fun `Given node with parent When replace node with parent Then replace Node with parent`() {
-        val parentSkill = Skill(newUUID(), "parent skill")
-        val anotherParentSkill = Skill(newUUID(), "parent skill")
-        val originalParentNode = Node(newUUID(), skill = parentSkill)
-        val replacedParentNode = Node(newUUID(), skill = anotherParentSkill)
-        val skill = Skill(newUUID(), "skill")
-        val originalNode = Node(newUUID(), skill = skill, parent = originalParentNode)
-
-        doReturn(skill).`when`(skillService).getSkill(skill.id)
-        nodes[originalNode.id] = originalNode
-        nodes[originalParentNode.id] = originalParentNode
-        nodes[replacedParentNode.id] = replacedParentNode
-
-        val replacedNode = nodeService.replaceNode(originalNode.id, skillId = originalNode.skill.id, parentId = replacedParentNode.id)
-        assertThat(replacedNode).isNotNull()
-        assertThat(replacedNode).isNotEqualTo(originalNode)
-        assertThat(replacedNode).isNotNull()
-        assertThat(replacedNode?.parent).isNotEqualTo(originalParentNode)
-        assertThat(replacedNode?.parent).isEqualTo(replacedParentNode)
-        assertThat(nodes[replacedNode?.id]).isEqualTo(replacedNode)
-    }
-
-    @Test
-    fun `Given node without children When replace node with children Then replace Node with children`() {
-        val children = generateNodes()
-        val skill = Skill(newUUID(), "skill")
-        val originalNode = Node(newUUID(), skill = skill)
-
-        doReturn(skill).`when`(skillService).getSkill(skill.id)
-        nodes[originalNode.id] = originalNode
-        nodes.putAll(children)
-
-        val replacedNode = nodeService.replaceNode(originalNode.id, skillId = originalNode.skill.id, childrenIds = children.keys)
-        assertThat(replacedNode).isNotNull()
-        assertThat(replacedNode).isNotEqualTo(originalNode)
-        assertThat(replacedNode).isNotNull()
-        assertThat(replacedNode?.children).isNotEmpty()
-        assertThat(replacedNode?.children).isEqualTo(children.values)
-        assertThat(nodes[replacedNode?.id]).isEqualTo(replacedNode)
-    }
-
-    @Test
-    fun `Given node with children When replace node with children Then replace Node with children`() {
-        val originalChildren = generateNodes()
-        val replacedChildren = generateNodes()
-        val skill = Skill(newUUID(), "skill")
-        val originalNode = Node(newUUID(), skill = skill)
-
-        doReturn(skill).`when`(skillService).getSkill(skill.id)
-        nodes[originalNode.id] = originalNode
-        nodes.putAll(originalChildren)
-        nodes.putAll(replacedChildren)
-
-        val replacedNode = nodeService.replaceNode(originalNode.id, skillId = originalNode.skill.id, childrenIds = replacedChildren.keys)
-        assertThat(replacedNode).isNotNull()
-        assertThat(replacedNode).isNotEqualTo(originalNode)
-        assertThat(replacedNode).isNotNull()
-        assertThat(replacedNode?.children).isNotEqualTo(originalChildren)
-        assertThat(replacedNode?.children).isEqualTo(replacedChildren.values)
-        assertThat(nodes[replacedNode?.id]).isEqualTo(replacedNode)
-    }
-
-    @Test
-    fun `Given non existing id When replace node Then return null and dont change collection`() {
-        val nodesBefore = nodes.map { it.key to it.value }.toMap()
-        val replacedNode = nodeService.replaceNode(newUUID(), skillId = newUUID())
+    fun `Given non existing id When replace node Then return null and dont call nodeRepository updateNode`() {
+        val nonExistingId = newUUID()
+        val skill = Skill(newUUID(), "title")
+        val replacedNode = nodeService.replaceNode(nonExistingId, skillId = skill.id)
         assertThat(replacedNode).isNull()
-        assertThat(nodes).isEqualTo(nodesBefore)
+        verify(nodeRepository, times(1)).exists(nonExistingId)
+        verify(nodeRepository, times(0)).updateNode(nonExistingId, skill = skill)
     }
 
     @Test
     fun `Given non existing skill id When replaced node Then throw SkillTreeException`() {
         val skill = Skill(newUUID(), "skill")
         val node = Node(newUUID(), skill = skill)
+        doReturn(node).`when`(nodeRepository).getNode(node.id)
+        doReturn(true).`when`(nodeRepository).exists(node.id)
+        doReturn(null).`when`(skillService).getSkill(skill.id)
         nodes[node.id] = node
         assertThatThrownBy { nodeService.replaceNode(node.id, skillId = skill.id) }
             .hasMessage("Not found skill with id = ${skill.id}")
     }
-
-
-    private fun generateNodes() = generateSequence { newUUID() }
-        .map { Skill(it, it) }
-        .map { val id = newUUID(); id to Node(id, skill = it) }
-        .take(1).toMap()
 
 
 }

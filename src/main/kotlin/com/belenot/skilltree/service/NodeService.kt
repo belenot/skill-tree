@@ -15,8 +15,7 @@ open class NodeService(val nodeRepository: NodeRepository, val skillService: Ski
     open fun createNode(skillId: String, childrenIds: Set<String> = emptySet(), parentId: String? = null): Node {
         val skill = skillService.getSkill(skillId)
         if (skill != null) {
-            val node = nodeRepository.createNode(childrenIds.toSet(), skill, parentId)
-            return node
+            return nodeRepository.createNode(childrenIds.toSet(), skill, parentId)
         } else {
             throw SkillTreeException("Not found skill with id = ${skillId}")
         }
