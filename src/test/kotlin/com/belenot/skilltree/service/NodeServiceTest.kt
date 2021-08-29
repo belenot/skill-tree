@@ -134,6 +134,7 @@ class NodeServiceTest {
         assertThat(replacedNode).isNotEqualTo(node)
         assertThat(replacedNode).isNotNull()
         assertThat(replacedNode?.parent).isEqualTo(parentNode)
+        assertThat(nodes[replacedNode?.id]).isEqualTo(replacedNode)
     }
 
     @Test
@@ -156,6 +157,7 @@ class NodeServiceTest {
         assertThat(replacedNode).isNotNull()
         assertThat(replacedNode?.parent).isNotEqualTo(originalParentNode)
         assertThat(replacedNode?.parent).isEqualTo(replacedParentNode)
+        assertThat(nodes[replacedNode?.id]).isEqualTo(replacedNode)
     }
 
     @Test
@@ -174,6 +176,7 @@ class NodeServiceTest {
         assertThat(replacedNode).isNotNull()
         assertThat(replacedNode?.children).isNotEmpty()
         assertThat(replacedNode?.children).isEqualTo(children.values)
+        assertThat(nodes[replacedNode?.id]).isEqualTo(replacedNode)
     }
 
     @Test
@@ -194,12 +197,15 @@ class NodeServiceTest {
         assertThat(replacedNode).isNotNull()
         assertThat(replacedNode?.children).isNotEqualTo(originalChildren)
         assertThat(replacedNode?.children).isEqualTo(replacedChildren.values)
+        assertThat(nodes[replacedNode?.id]).isEqualTo(replacedNode)
     }
 
     @Test
     fun `Given non existing id When replace node Then return null and dont change collection`() {
+        val nodesBefore = nodes.map { it.key to it.value }.toMap()
         val replacedNode = nodeService.replaceNode(newUUID(), skillId = newUUID())
         assertThat(replacedNode).isNull()
+        assertThat(nodes).isEqualTo(nodesBefore)
     }
 
     @Test

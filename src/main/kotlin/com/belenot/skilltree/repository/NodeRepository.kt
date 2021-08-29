@@ -21,5 +21,5 @@ class NodeRepository(val nodes: MutableMap<String, Node>) {
             children = childrenIds.mapNotNull { nodes[it] }.toSet(),
             skill = skill,
             parent = nodes[parentId])
-            // .also { nodes.replace(id, it) }
+            .also { nodes.replace(id, it) }
 }
