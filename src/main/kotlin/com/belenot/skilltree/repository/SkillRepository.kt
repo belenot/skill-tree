@@ -6,20 +6,20 @@ import com.belenot.skilltree.utils.paged
 import org.springframework.stereotype.Repository
 
 @Repository
-class SkillRepository {
+open class SkillRepository(
+    private val skills: MutableMap<String, Skill>) {
 
-    private val skills  = mutableMapOf<String, Skill>()
 
-    fun getSkill(page: Int, size: Int): List<Skill> = paged(skills.values, page, size)
-    fun containsId(id: String): Boolean = skills.containsKey(id)
-    fun getSkill(id: String) = skills[id]
-    fun createSkill(title: String): Skill {
+    open fun getSkill(page: Int, size: Int): List<Skill> = paged(skills.values, page, size)
+    open fun containsId(id: String): Boolean = skills.containsKey(id)
+    open fun getSkill(id: String) = skills[id]
+    open fun createSkill(title: String): Skill {
         val id = newUUID()
         val skill = Skill(id = id, title = title)
         skills.put(id, skill)
         return skill
     }
 
-    fun deleteSkill(id: String): Skill? = skills.remove(id)
-    fun updateSkill(id: String, title: String): Skill? = skills.replace(id, Skill(id = id, title = title))
+    open fun deleteSkill(id: String): Skill? = skills.remove(id)
+    open fun updateSkill(id: String, title: String): Skill? = skills.replace(id, Skill(id = id, title = title))
 }

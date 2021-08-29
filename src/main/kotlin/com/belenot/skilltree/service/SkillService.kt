@@ -10,9 +10,7 @@ open class SkillService(val skillRepository: SkillRepository) {
 
     open fun getSkill(page: Int, size: Int) = skillRepository.getSkill(page, size)
 
-    open fun getSkill(id: String) =
-        if (skillRepository.containsId(id)) skillRepository.getSkill(id)
-        else null
+    open fun getSkill(id: String) = skillRepository.getSkill(id)
 
     open fun createSkill(title: String): Skill = skillRepository.createSkill(title)
 
