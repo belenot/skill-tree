@@ -1,6 +1,7 @@
 package com.belenot.skilltree.service
 
 import com.belenot.skilltree.SkillTreeException
+import com.belenot.skilltree.repository.SkillRepository
 import com.belenot.skilltree.utils.PAGING_VALIDATION_VIOLATION
 import com.belenot.skilltree.utils.newUUID
 import org.junit.jupiter.api.BeforeEach
@@ -9,10 +10,12 @@ import org.assertj.core.api.Assertions.*
 
 class SkillServiceTest {
     lateinit var skillService: SkillService
+    lateinit var skillRepository: SkillRepository
 
     @BeforeEach
     fun beforeEach() {
-        skillService = SkillService()
+        skillRepository = SkillRepository()
+        skillService = SkillService(skillRepository)
     }
 
     @Test

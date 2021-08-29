@@ -20,16 +20,9 @@ open class SkillService(val skillRepository: SkillRepository) {
         if (skillRepository.containsId(id)) skillRepository.getSkill(id)
         else null
 
-    open fun createSkill(title: String): Skill {
-        val id = newUUID()
-        val skill = Skill(id = id, title = title)
-        skills.put(id, skill)
-        return skill
-    }
+    open fun createSkill(title: String): Skill = skillRepository.createSkill(title)
 
-    open fun deleteSkill(id: String) = skills.remove(id)
+    open fun deleteSkill(id: String): Skill? = skillRepository.deleteSkill(id)
 
-    open fun replaceSkill(id: String, title: String) =
-        if (skills.containsKey(id)) skills.replace(id, Skill(id = id, title = title))
-        else null
+    open fun replaceSkill(id: String, title: String) = skillRepository.updateSkill(id, title)
 }
