@@ -3,6 +3,7 @@ package com.belenot.skilltree.service
 import com.belenot.skilltree.SkillTreeException
 import com.belenot.skilltree.domain.Node
 import com.belenot.skilltree.domain.Skill
+import com.belenot.skilltree.repository.NodeRepository
 import com.belenot.skilltree.utils.newUUID
 import org.assertj.core.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
@@ -14,12 +15,14 @@ class NodeServiceTest {
     lateinit var nodeService: NodeService
     lateinit var skillService: SkillService
     lateinit var nodes: MutableMap<String, Node>
+    lateinit var nodeRepository: NodeRepository
 
     @BeforeEach
     fun beforeEach() {
         skillService = mock(SkillService::class.java)
         nodes = mutableMapOf()
-        nodeService = NodeService(nodes, skillService)
+        nodeRepository = NodeRepository(nodes)
+        nodeService = NodeService(nodeRepository, skillService)
     }
 
     @Test
