@@ -5,15 +5,16 @@ import com.belenot.skilltree.domain.Tree
 import com.belenot.skilltree.utils.newUUID
 import com.belenot.skilltree.utils.paged
 
-class TreeRepository(val trees: MutableMap<String, Tree>) {
-    fun getTree(page: Int, size: Int): List<Tree> = paged(trees.values, page, size)
-    fun getTree(id: String): Tree? = trees[id]
-    fun exists(id: String): Boolean = trees.containsKey(id)
-    fun createTree(description: String, root: Node): Tree =
+open class TreeRepository(val trees: MutableMap<String, Tree> = mutableMapOf()) {
+    open fun getTree(page: Int, size: Int): List<Tree> = paged(trees.values, page, size)
+    open fun getTree(id: String): Tree? = trees[id]
+    open fun exists(id: String): Boolean = trees.containsKey(id)
+    open fun createTree(description: String, root: Node): Tree =
         Tree(id = newUUID(), root = root, description = description)
+            .also { trees[it.id] = it }
 
-    fun removeTree(id: String) = trees.remove(id)
-    fun updateTree(id: String, description: String, root: Node): Tree =
+    open fun removeTree(id: String) = trees.remove(id)
+    open fun updateTree(id: String, description: String, root: Node): Tree =
         Tree(id = id, root = root, description = description)
-            .also { trees.replace(id, it) }
+            .also { trees[id] = it }
 }
