@@ -8,7 +8,7 @@ import com.belenot.skilltree.utils.paged
 open class TreeRepository(val trees: MutableMap<String, Tree> = mutableMapOf()) {
     open fun getTree(page: Int, size: Int): List<Tree> = paged(trees.values, page, size)
     open fun getTree(id: String): Tree? = trees[id]
-    open fun exists(id: String): Boolean = trees.containsKey(id)
+    open fun containsId(id: String): Boolean = trees.containsKey(id)
     open fun createTree(description: String, root: Node): Tree =
         Tree(id = newUUID(), root = root, description = description)
             .also { trees[it.id] = it }

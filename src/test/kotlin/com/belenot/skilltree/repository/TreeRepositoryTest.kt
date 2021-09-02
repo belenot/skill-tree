@@ -96,6 +96,25 @@ class TreeRepositoryTest {
 
     }
 
+    @Test
+    fun `Given tree id and there exists tree with this id When call containsId Then return true`() {
+        val treeId = newUUID()
+        val tree = Tree(treeId, Node(newUUID(), skill = Skill(newUUID(), "skill")), "tree")
+        trees[treeId] = tree
+        val actualResult = treeRepository.containsId(treeId)
+
+        assertThat(actualResult).isTrue()
+    }
+
+    @Test
+    fun `Given skill id and there doesnt exist skill with this id When call containsId Then return false`() {
+        val skillId = newUUID()
+
+        val actualResult = treeRepository.containsId(skillId)
+
+        assertThat(actualResult).isFalse()
+    }
+
 
 
 }

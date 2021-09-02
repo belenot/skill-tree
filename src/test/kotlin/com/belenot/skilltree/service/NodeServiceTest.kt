@@ -3,7 +3,6 @@ package com.belenot.skilltree.service
 import com.belenot.skilltree.SkillTreeException
 import com.belenot.skilltree.domain.Node
 import com.belenot.skilltree.domain.Skill
-import com.belenot.skilltree.generateNodes
 import com.belenot.skilltree.repository.NodeRepository
 import com.belenot.skilltree.utils.newUUID
 import org.assertj.core.api.Assertions.*
@@ -63,11 +62,11 @@ class NodeServiceTest {
         val skill = Skill(newUUID(), "")
         val node = Node(newUUID(), skill = skill)
         doReturn(skill).`when`(skillService).getSkill(skill.id)
-        doReturn(true).`when`(nodeRepository).exists(node.id)
+        doReturn(true).`when`(nodeRepository).containsId(node.id)
         doReturn(node).`when`(nodeRepository).updateNode(node.id, skill = skill)
         nodeService.replaceNode(node.id, skillId = node.skill.id)
         verify(skillService, times(1)).getSkill(skill.id)
-        verify(nodeRepository, times(1)).exists(node.id)
+        verify(nodeRepository, times(1)).containsId(node.id)
         verify(nodeRepository, times(1)).updateNode(node.id, skill = skill)
     }
 
@@ -77,7 +76,7 @@ class NodeServiceTest {
         val skill = Skill(newUUID(), "title")
         val replacedNode = nodeService.replaceNode(nonExistingId, skillId = skill.id)
         assertThat(replacedNode).isNull()
-        verify(nodeRepository, times(1)).exists(nonExistingId)
+        verify(nodeRepository, times(1)).containsId(nonExistingId)
         verify(nodeRepository, times(0)).updateNode(nonExistingId, skill = skill)
     }
 
@@ -86,11 +85,20 @@ class NodeServiceTest {
         val skill = Skill(newUUID(), "skill")
         val node = Node(newUUID(), skill = skill)
         doReturn(node).`when`(nodeRepository).getNode(node.id)
-        doReturn(true).`when`(nodeRepository).exists(node.id)
+        doReturn(true).`when`(nodeRepository).containsId(node.id)
         doReturn(null).`when`(skillService).getSkill(skill.id)
         assertThatThrownBy { nodeService.replaceNode(node.id, skillId = skill.id) }
             .hasMessage("Not found skill with id = ${skill.id}")
     }
 
+
+    @Test
+    fun `Given known node id When getNode Then call nodeRepository getNode`() {
+        val nodeId = newUUID()
+
+        nodeService.getNode(nodeId)
+
+        verify(nodeRepository, times(1)).getNode(nodeId)
+    }
 
 }

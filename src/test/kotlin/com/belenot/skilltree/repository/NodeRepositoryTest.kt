@@ -218,4 +218,25 @@ internal class NodeRepositoryTest {
         assertThat(nodesAfter).doesNotContain(originalNode)
     }
 
+
+    @Test
+    fun `Given node id and there exists node with this id When call containsId Then return true`() {
+        val nodeId = newUUID()
+        val node = Node(nodeId, skill = Skill(newUUID(), "skill"))
+        nodes[nodeId] = node
+
+        val actualResult = nodeRepository.containsId(nodeId)
+
+        assertThat(actualResult).isTrue()
+    }
+
+    @Test
+    fun `Given skill id and there doesnt exist skill with this id When call containsId Then return false`() {
+        val skillId = newUUID()
+
+        val actualResult = nodeRepository.containsId(skillId)
+
+        assertThat(actualResult).isFalse()
+    }
+
 }

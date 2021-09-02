@@ -84,7 +84,7 @@ class TreeServiceTest {
     fun `Given known tree id and unknown root node id When replace tree Then throw SkillTreeException and do not call treeRepository updateTree`() {
         val originalTree = Tree(newUUID(), root = Node(newUUID(), skill = Skill(newUUID(), "")), "original tree")
         val unknownNode = Node(newUUID(), skill = Skill(newUUID(), "skill"))
-        doReturn(true).`when`(treeRepository).exists(originalTree.id)
+        doReturn(true).`when`(treeRepository).containsId(originalTree.id)
         doReturn(null).`when`(nodeService).getNode(originalTree.root.id)
         assertThatThrownBy { treeService.replaceTree(originalTree.id, unknownNode.id, "replaced tree") }
         verify(treeRepository, times(0)).updateTree(originalTree.id, "replaced tree", unknownNode)
@@ -98,7 +98,7 @@ class TreeServiceTest {
         val expectedTree = Tree(originalTree.id, replacedNode, "replaced tree")
         doReturn(originalNode).`when`(nodeService).getNode(originalNode.id)
         doReturn(replacedNode).`when`(nodeService).getNode(replacedNode.id)
-        doReturn(true).`when`(treeRepository).exists(originalTree.id)
+        doReturn(true).`when`(treeRepository).containsId(originalTree.id)
         doReturn(expectedTree).`when`(treeRepository).updateTree(originalTree.id, expectedTree.description, expectedTree.root)
 
         val replacedTree = treeService.replaceTree(originalTree.id, replacedNode.id, "replaced tree")
@@ -108,6 +108,16 @@ class TreeServiceTest {
         assertThat(replacedTree?.description).isEqualTo("replaced tree")
         verify(treeRepository, times(1)).updateTree(originalTree.id, "replaced tree", replacedNode)
 
+    }
+
+    @Test
+    fun `Given unknown tree id When replace tree Then call treeRepository containsId and return null`() {
+        val unknownTreeId = newUUID()
+        val anyRootId = newUUID()
+        val replacedTree = treeService.replaceTree(unknownTreeId, anyRootId, "any description")
+
+        assertThat(replacedTree).isNull()
+        verify(treeRepository, times(1)).containsId(unknownTreeId)
     }
 
 

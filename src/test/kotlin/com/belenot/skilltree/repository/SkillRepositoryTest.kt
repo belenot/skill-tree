@@ -79,4 +79,25 @@ class SkillRepositoryTest {
         val actualSkill = skillRepository.getSkill(skill.id)
         assertThat(actualSkill).isEqualTo(skill)
     }
+
+    @Test
+    fun `Given skill id and there exists skill with this id When call containsId Then return true`() {
+        val skillId = newUUID()
+        val skill = Skill(skillId, "skill")
+        skills[skillId] = skill
+
+        val actualResult = skillRepository.containsId(skillId)
+
+        assertThat(actualResult).isTrue()
+    }
+
+    @Test
+    fun `Given skill id and there doesnt exist skill with this id When call containsId Then return false`() {
+        val skillId = newUUID()
+
+        val actualResult = skillRepository.containsId(skillId)
+
+        assertThat(actualResult).isFalse()
+    }
+
 }

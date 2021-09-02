@@ -24,7 +24,7 @@ open class NodeService(val nodeRepository: NodeRepository, val skillService: Ski
     open fun deleteNode(id: String): Node? = nodeRepository.removeNode(id)
 
     open fun replaceNode(id: String, skillId: String, childrenIds: Set<String> = emptySet(), parentId: String? = null): Node? {
-        if (nodeRepository.exists(id)) {
+        if (nodeRepository.containsId(id)) {
             val skill = skillService.getSkill(skillId)
             if (skill != null) {
                 val node = nodeRepository.updateNode(id, childrenIds.toSet(), skill, parentId)

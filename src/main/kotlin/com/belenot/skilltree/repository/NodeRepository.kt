@@ -16,7 +16,7 @@ open class NodeRepository(val nodes: MutableMap<String, Node>  = mutableMapOf())
         parent = nodes[parentId])
         .also { nodes[it.id] = it }
     open fun removeNode(id: String): Node? = nodes.remove(id)
-    open fun exists(id: String): Boolean = nodes.containsKey(id)
+    open fun containsId(id: String): Boolean = nodes.containsKey(id)
     open fun updateNode(id: String, childrenIds: Set<String> = emptySet(), skill: Skill, parentId: String? = null): Node =
         Node(id,
             children = childrenIds.mapNotNull { nodes[it] }.toSet(),

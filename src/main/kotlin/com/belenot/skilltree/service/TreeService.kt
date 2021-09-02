@@ -24,7 +24,7 @@ class TreeService(val treeRepository: TreeRepository, val nodeService: NodeServi
     fun deleteTree(id: String): Tree? = treeRepository.removeTree(id)
 
     fun replaceTree(id: String, rootId: String, description: String): Tree? {
-        if (treeRepository.exists(id)) {
+        if (treeRepository.containsId(id)) {
             val root = nodeService.getNode(rootId)
             if (root != null) {
                 return treeRepository.updateTree(id, description, root)
