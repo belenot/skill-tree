@@ -28,6 +28,9 @@ dependencies {
     implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.5.9'
     // https://mvnrepository.com/artifact/org.mongodb/mongodb-driver-sync
     implementation group: 'org.mongodb', name: 'mongodb-driver-sync', version: '4.3.1'
+    // https://mvnrepository.com/artifact/io.leangen.graphql/spqr
+    implementation 'io.leangen.graphql:spqr:0.11.2'
+    implementation 'com.graphql-java:graphiql-spring-boot-starter:5.0.2'
 
 
     testImplementation "org.mockito:mockito-core:3.+"

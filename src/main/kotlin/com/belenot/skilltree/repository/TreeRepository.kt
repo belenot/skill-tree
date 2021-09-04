@@ -4,7 +4,9 @@ import com.belenot.skilltree.domain.Node
 import com.belenot.skilltree.domain.Tree
 import com.belenot.skilltree.utils.newUUID
 import com.belenot.skilltree.utils.paged
+import org.springframework.stereotype.Repository
 
+@Repository
 open class TreeRepository(val trees: MutableMap<String, Tree> = mutableMapOf()) {
     open fun getTree(page: Int, size: Int): List<Tree> = paged(trees.values, page, size)
     open fun getTree(id: String): Tree? = trees[id]
