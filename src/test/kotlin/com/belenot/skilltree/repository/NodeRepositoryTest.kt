@@ -1,15 +1,12 @@
 package com.belenot.skilltree.repository
 
-import com.belenot.skilltree.SkillTreeException
 import com.belenot.skilltree.domain.Node
 import com.belenot.skilltree.domain.Skill
 import com.belenot.skilltree.generateNodes
 import com.belenot.skilltree.utils.newUUID
-import org.assertj.core.api.Assertions.*
-import org.junit.jupiter.api.Assertions.*
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito
 
 internal class NodeRepositoryTest {
     lateinit var nodeRepository: NodeRepository
@@ -54,8 +51,8 @@ internal class NodeRepositoryTest {
         val nodesAfter = nodes.map {it.value}.toSet()
         assertThat(node.id).isNotBlank()
         assertThat(node.skill).isEqualTo(skill)
-        assertThat(node.children).isEmpty()
-        assertThat(node.parent).isNull()
+        assertThat(node.childrenIds).isEmpty()
+        assertThat(node.parentId).isNull()
         assertThat(nodesBefore).isNotEqualTo(nodesAfter)
         assertThat(nodes).containsValue(node)
     }
@@ -71,8 +68,8 @@ internal class NodeRepositoryTest {
         val nodesAfter = nodes.map {it.value}.toSet()
         assertThat(node.id).isNotBlank()
         assertThat(node.skill).isEqualTo(skill)
-        assertThat(node.children).isEmpty()
-        assertThat(node.parent).isEqualTo(parentNode)
+        assertThat(node.childrenIds).isEmpty()
+        assertThat(node.parentId).isEqualTo(parentNode.id)
         assertThat(nodesBefore).isNotEqualTo(nodesAfter)
         assertThat(nodes).containsValue(node)
     }
@@ -87,7 +84,7 @@ internal class NodeRepositoryTest {
         val nodesAfter = nodes.map {it.value}.toSet()
         assertThat(node.id).isNotBlank()
         assertThat(node.skill).isEqualTo(skill)
-        assertThat(node.children).isEqualTo(children.values)
+        assertThat(node.childrenIds).isEqualTo(children.values.map { it.id }.toSet())
         assertThat(nodesBefore).isNotEqualTo(nodesAfter)
         assertThat(nodes).containsValue(node)
     }
@@ -141,7 +138,7 @@ internal class NodeRepositoryTest {
         assertThat(replacedNode).isNotNull()
         assertThat(node.id).isEqualTo(replacedNode.id)
         assertThat(replacedNode).isNotEqualTo(node)
-        assertThat(replacedNode.parent).isEqualTo(parentNode)
+        assertThat(replacedNode.parentId).isEqualTo(parentNode.id)
         assertThat(nodes[replacedNode.id]).isEqualTo(replacedNode)
         assertThat(nodesBefore).isNotEqualTo(nodesAfter)
         assertThat(nodesBefore).contains(node)
@@ -155,7 +152,7 @@ internal class NodeRepositoryTest {
         val originalParentNode = Node(newUUID(), skill = parentSkill)
         val replacedParentNode = Node(newUUID(), skill = anotherParentSkill)
         val skill = Skill(newUUID(), "skill")
-        val originalNode = Node(newUUID(), skill = skill, parent = originalParentNode)
+        val originalNode = Node(newUUID(), skill = skill, parentId = originalParentNode.id)
         nodes[originalNode.id] = originalNode
         nodes[originalParentNode.id] = originalParentNode
         nodes[replacedParentNode.id] = replacedParentNode
@@ -165,8 +162,8 @@ internal class NodeRepositoryTest {
         val nodesAfter = nodes.map { it.value }.toSet()
         assertThat(replacedNode).isNotNull()
         assertThat(replacedNode).isNotEqualTo(originalNode)
-        assertThat(replacedNode.parent).isNotEqualTo(originalParentNode)
-        assertThat(replacedNode.parent).isEqualTo(replacedParentNode)
+        assertThat(replacedNode.parentId).isNotEqualTo(originalParentNode.id)
+        assertThat(replacedNode.parentId).isEqualTo(replacedParentNode.id)
         assertThat(nodes[replacedNode.id]).isEqualTo(replacedNode)
         assertThat(nodesBefore).isNotEqualTo(nodesAfter)
         assertThat(nodesAfter).contains(replacedNode)
@@ -187,8 +184,8 @@ internal class NodeRepositoryTest {
         val nodesAfter = nodes.map { it.value }.toSet()
         assertThat(replacedNode).isNotNull()
         assertThat(replacedNode).isNotEqualTo(originalNode)
-        assertThat(replacedNode.children).isNotEmpty()
-        assertThat(replacedNode.children).isEqualTo(children.values)
+        assertThat(replacedNode.childrenIds).isNotEmpty()
+        assertThat(replacedNode.childrenIds).isEqualTo(children.values.map { it.id }.toSet())
         assertThat(nodes[replacedNode.id]).isEqualTo(replacedNode)
         assertThat(nodesBefore).isNotEqualTo(nodesAfter)
         assertThat(nodesAfter).contains(replacedNode)
@@ -210,8 +207,8 @@ internal class NodeRepositoryTest {
         val nodesAfter = nodes.map { it.value }.toSet()
         assertThat(replacedNode).isNotNull()
         assertThat(replacedNode).isNotEqualTo(originalNode)
-        assertThat(replacedNode.children).isNotEqualTo(originalChildren)
-        assertThat(replacedNode.children).isEqualTo(replacedChildren.values)
+        assertThat(replacedNode.childrenIds).isNotEqualTo(originalChildren.values.map { it.id }.toSet())
+        assertThat(replacedNode.childrenIds).isEqualTo(replacedChildren.values.map { it.id }.toSet())
         assertThat(nodes[replacedNode.id]).isEqualTo(replacedNode)
         assertThat(nodesBefore).isNotEqualTo(nodesAfter)
         assertThat(nodesAfter).contains(replacedNode)
