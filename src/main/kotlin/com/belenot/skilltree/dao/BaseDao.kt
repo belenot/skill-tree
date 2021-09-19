@@ -71,7 +71,7 @@ interface BaseGetAllDao<T: BaseDto> {
      * @param size how many entities count after start
      * @return list of entities
      */
-    fun get(skip: Int, size: Int)
+    fun get(skip: Int, size: Int): List<T>
 }
 
 

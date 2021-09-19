@@ -7,8 +7,8 @@ class LocalNodeDao(val nodes: MutableMap<String, NodeDto>): GenericLocalDao<Node
 class LocalTreeDao(val trees: MutableMap<String, TreeDto>): GenericLocalDao<TreeDto>(trees)
 
 open class GenericLocalDao<T: BaseDto>(val collection: MutableMap<String, T>): BaseDao<T> {
-    override fun get(skip: Int, size: Int) {
-        collection.values.toList()[skip ]
+    override fun get(skip: Int, size: Int): List<T> {
+        return collection.values.toList().subList(skip, skip + size)
     }
 
     override fun get(id: String): T? {
