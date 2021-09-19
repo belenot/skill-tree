@@ -2,13 +2,21 @@ package com.belenot.skilltree.dao
 
 import com.belenot.skilltree.utils.newUUID
 
-class LocalSkillDao(val skills: MutableMap<String, SkillDto>): GenericLocalDao<SkillDto>(skills)
-class LocalNodeDao(val nodes: MutableMap<String, NodeDto>): GenericLocalDao<NodeDto>(nodes)
-class LocalTreeDao(val trees: MutableMap<String, TreeDto>): GenericLocalDao<TreeDto>(trees)
+class LocalSkillDao(val skills: MutableMap<String, SkillDto>): GenericLocalDao<SkillDto>(skills), SkillDao
+class LocalNodeDao(val nodes: MutableMap<String, NodeDto>): GenericLocalDao<NodeDto>(nodes), NodeDao
+class LocalTreeDao(val trees: MutableMap<String, TreeDto>): GenericLocalDao<TreeDto>(trees), TreeDao
 
 open class GenericLocalDao<T: BaseDto>(val collection: MutableMap<String, T>): BaseDao<T> {
     override fun get(skip: Int, size: Int): List<T> {
-        return collection.values.toList().subList(skip, skip + size)
+        if (skip < collection.values.size) {
+            if (skip + size < collection.values.size) {
+                return collection.values.toList().subList(skip, skip + size)
+            } else {
+                return collection.values.toList().subList(skip, collection.values.size)
+            }
+        } else {
+            return emptyList()
+        }
     }
 
     override fun get(id: String): T? {
@@ -25,7 +33,7 @@ open class GenericLocalDao<T: BaseDto>(val collection: MutableMap<String, T>): B
     override fun update(dto: T) {
         val id = dto.id
         if (id == null) throw DaoException("dto id should not be null in update.", null)
-        collection[id] = dto
+        if (collection.containsKey(id)) collection[id] = dto
     }
 
     override fun delete(id: String) {

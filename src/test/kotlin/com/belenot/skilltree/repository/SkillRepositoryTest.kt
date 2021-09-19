@@ -1,5 +1,7 @@
 package com.belenot.skilltree.repository
 
+import com.belenot.skilltree.dao.LocalSkillDao
+import com.belenot.skilltree.dao.SkillDto
 import com.belenot.skilltree.domain.Skill
 import com.belenot.skilltree.utils.newUUID
 import org.assertj.core.api.Assertions.*
@@ -7,13 +9,14 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class SkillRepositoryTest {
-    lateinit var skills: MutableMap<String, Skill>
+    lateinit var skills: MutableMap<String, SkillDto>
     lateinit var skillRepository: SkillRepository
 
     @BeforeEach
     fun beforeEach() {
         skills = mutableMapOf()
-        skillRepository = SkillRepository(skills)
+        val skillDao = LocalSkillDao(skills)
+        skillRepository = SkillRepository(skillDao)
     }
 
     @Test
@@ -27,27 +30,28 @@ class SkillRepositoryTest {
         val createdSkill = skillRepository.createSkill("title")
         assertThat(createdSkill.id).isNotBlank()
         assertThat(createdSkill.title).isEqualTo("title")
-        assertThat(skills[createdSkill.id]).isEqualTo(createdSkill)
+        val expectedDto = SkillDto(createdSkill.id, createdSkill.title)
+        assertThat(skills[createdSkill.id]).isEqualTo(expectedDto)
     }
 
     @Test
     fun `When delete skill Then remove skill from collection`() {
         val skillForDeletion = Skill(newUUID(), "skill for deletion")
-        skills[skillForDeletion.id] = skillForDeletion
-        val skillsBefore = skills.map { it }
+        skills[skillForDeletion.id] = SkillDto(skillForDeletion.id, skillForDeletion.title)
+        val skillDtosBefore = skills.map { it }
         val deletedSkill = skillRepository.deleteSkill(skillForDeletion.id)
 
         assertThat(deletedSkill).isNotNull()
         assertThat(deletedSkill?.id).isEqualTo(skillForDeletion.id)
         assertThat(deletedSkill?.title).isEqualTo(skillForDeletion.title)
-        assertThat(skillsBefore).isNotEqualTo(skills)
+        assertThat(skillDtosBefore).isNotEqualTo(skills)
         assertThat(skills).doesNotContainKey(skillForDeletion.id)
     }
 
     @Test
     fun `When update skill Then update skill`() {
         val skillForUpdate = Skill(newUUID(), "skill for update")
-        skills[skillForUpdate.id] = skillForUpdate
+        skills[skillForUpdate.id] = SkillDto(skillForUpdate.id, skillForUpdate.title)
         val previousSkill = skillRepository.updateSkill(skillForUpdate.id, "updated title")
         assertThat(previousSkill).isNotNull()
         assertThat(previousSkill!!).isEqualTo(skillForUpdate)
@@ -75,7 +79,7 @@ class SkillRepositoryTest {
     @Test
     fun `When get skill Then return Skill`() {
         val skill = Skill(newUUID(), "new skill")
-        skills[skill.id] = skill
+        skills[skill.id] = SkillDto(skill.id, skill.title)
         val actualSkill = skillRepository.getSkill(skill.id)
         assertThat(actualSkill).isEqualTo(skill)
     }
@@ -84,7 +88,7 @@ class SkillRepositoryTest {
     fun `Given skill id and there exists skill with this id When call containsId Then return true`() {
         val skillId = newUUID()
         val skill = Skill(skillId, "skill")
-        skills[skillId] = skill
+        skills[skillId] = SkillDto(skill.id, skill.title)
 
         val actualResult = skillRepository.containsId(skillId)
 
